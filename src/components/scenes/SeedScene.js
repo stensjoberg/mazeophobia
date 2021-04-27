@@ -3,6 +3,7 @@ import { Scene, Color } from 'three';
 import { Flower, Land } from 'objects';
 import { BasicLights } from 'lights';
 import { Wall } from '../objects/Wall';
+import Maze from './Maze';
 
 class SeedScene extends Scene {
     constructor() {
@@ -28,53 +29,43 @@ class SeedScene extends Scene {
         // this.add(wall);
 
         // Defines size of maze
-        const maze_width = 5;
-        const maze_depth = 5;
         const cell_width = 4;
 
+        const n = 5;
+
         function index(u, v) {
-            return u + v * (maze_width + 1);
+            return u + v * (n + 1);
         }
         this.index = index;
 
-        // Let's add all of the cells to the maze
-        // NOTE This can be replaced with a single floor
-        // TODO: relace with 1D array and index() function f(x, y) -> i
+        // Let's add all of the cells to the maze for visual understanding
         let lands = [];
-        for (let x = 0; x < maze_width; x++) {
-            for (let z = 0; z < maze_depth; z++) {
+        for (let x = 0; x < n; x++) {
+            for (let z = 0; z < n; z++) {
                 lands[index(x, z)] = new Land();
                 this.add(lands[index(x, z)]);
                 lands[index(x, z)].position.set(x * cell_width, 0, z * cell_width);
             }
         }
 
-        // Let's add all the walls which are edges between y-adjacent cells
-        // We set the rotation to zero here
-        //
-        let y_walls = [];
-        for (let x = 0; x < maze_width - 1; x++) {
-            for (let z = 0; z < maze_depth - 1; z++) {
-                y_walls[index(x, z)] = new Flower(this);
-                this.add(y_walls[index(x, z)]);
-                y_walls[index(x, z)].position.set((x * cell_width) + cell_width/2, 0, (z * cell_width));
-                z_walls[index(x, z)].rotation.y = Math.PI/2;
+        // Making a maze
+        let maze = new Maze(5);
+        maze.runKruskals();
+        let edges = maze.getEdges();
+
+        // Let's get the maze edges into the scene
+        let walls = [];
+        for (let i = 0; i < edges.length; i++) {
+            walls[i] = new Flower(this);
+            if (edges[i].x_orientation == true) {
+                walls[i].rotation.y = Math.PI/2
             }
+            walls[i].position.x = edges[i].x * cell_width;
+            walls[i].position.z = edges[i].y * cell_width;
+            this.add(walls[i]);
         }
 
-        // Let's add all the walls which are edges between z-adjacent cells
-        // Here, we rotate the walls by 90 degrees in y such that they separate the cells
-        let z_walls = [];
-        for (let x = 0; x < maze_width - 1; x++) {
-            for (let z = 0; z < maze_depth - 1; z++) {
-                z_walls[index(x, z)] = new Flower(this);
-                this.add(z_walls[index(x, z)]);
-                z_walls[index(x, z)].position.set((x * cell_width), 0, (z * cell_width) + cell_width/2);
-                z_walls[index(x, z)].rotation.y = 0;
-            }
-        }
 
-        // TODO apply Kruskal's on all edges in the two lists
 
 
         // Populate GUI
