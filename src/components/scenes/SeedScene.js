@@ -65,6 +65,9 @@ class SeedScene extends Scene {
             this.add(walls[i]);
         }
 
+        // TODO add perimetter wall around square
+        // TODO change walls and floor meshes and textures 
+
 
 
 
