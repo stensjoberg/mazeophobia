@@ -1,19 +1,14 @@
 {
-  "name": "lower-case-dashed-name-of-project",
-  "repository": "REPOSITORY-NAME-AS-IT-APPEARS-IN-GITHUB-URL",
+  "name": "mazeophobia",
+  "repository": "mazeophobia",
   "version": "0.1.0",
-  "title": "PROJECT TITLE HERE",
-  "description": "SHORT DESCRIPTION OF PROJECT HERE. ONE TO TWO SENTENCES MAX",
+  "title": "Mazeophobia: The fear of getting lost",
+  "description": "COS426 Spring 21 Final Project",
   "keywords": [
     "Princeton",
     "graphics",
     "three.js",
-    "COS 426",
-    "ivy league",
-    "keyword1",
-    "keyword2",
-    "...",
-    "this last entry CANNOT have a comma after it ->"
+    "COS 426"
   ],
   "scripts": {
     "start": "webpack-dev-server --mode development --output-public-path \"\"",
