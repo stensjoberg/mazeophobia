@@ -194,12 +194,5 @@
         }
       ]
     }
-  ],
-  "animations": [
-    {
-      "name": "default",
-      "samplers": [],
-      "channels": []
-    }
   ]
 }
