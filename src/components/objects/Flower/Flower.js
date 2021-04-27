@@ -25,11 +25,11 @@ class Flower extends Group {
         });
 
         // Add self to parent's update list
-        parent.addToUpdateList(this);
+        //parent.addToUpdateList(this);
 
         // Populate GUI
-        this.state.gui.add(this.state, 'bob');
-        this.state.gui.add(this.state, 'spin');
+        //this.state.gui.add(this.state, 'bob');
+        //this.state.gui.add(this.state, 'spin');
     }
 
     spin() {

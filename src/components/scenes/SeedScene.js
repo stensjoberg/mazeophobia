@@ -31,7 +31,7 @@ class SeedScene extends Scene {
         // Defines size of maze
         const cell_width = 4;
 
-        const n = 5;
+        const n = 10;
 
         function index(u, v) {
             return u + v * (n + 1);
@@ -49,7 +49,7 @@ class SeedScene extends Scene {
         }
 
         // Making a maze
-        let maze = new Maze(5);
+        let maze = new Maze(n);
         maze.runKruskals();
         let edges = maze.getEdges();
 
