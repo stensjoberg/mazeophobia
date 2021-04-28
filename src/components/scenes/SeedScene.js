@@ -1,9 +1,9 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, TextGeometry, FontLoader } from 'three';
+import { Scene, Color } from 'three';
 import { Floor, Wall } from 'objects';
 import { BasicLights } from 'lights';
 import Maze from './Maze';
-import { getFont } from './helper';
+import { addText, getFont } from './helper';
 
 class SeedScene extends Scene {
 
@@ -22,7 +22,7 @@ class SeedScene extends Scene {
         // Loading font for debug use later
         // This has to be done synchronously for when we want to actually use the font loaded
         const font = getFont();
-        console.log(font)
+
         // Set background to a nice color
         this.background = new Color(0x7ec0ee);
 
@@ -70,10 +70,15 @@ class SeedScene extends Scene {
         }
         // x: maze, z: 0.5 maze
         // TODO change walls and floor meshes and textures 
-
         
-        let textModel = new TextGeometry('Hello World', font);
-        this.add(textModel);
+        let wallText = [];
+        font.then(font => {
+            for (let i = 0; i < walls.length; i++) {
+                console.log(walls[i])
+                wallText[i] = addText(font, walls[i].id.toString(), walls[i].position.x, walls[i].position.y + 2*cellWidth, walls[i].position.z, walls[i].x_orientation);
+                this.add(wallText[i]);
+            }
+        });
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
@@ -85,7 +90,7 @@ class SeedScene extends Scene {
 
     update(timeStamp) {
         const { rotationSpeed, updateList } = this.state;
-        this.rotation.y = (rotationSpeed * timeStamp) / 10000;
+        // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
 
         // Call update for each object in the updateList
         for (const obj of updateList) {
