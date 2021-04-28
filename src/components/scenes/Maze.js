@@ -33,7 +33,6 @@ class Edge {
         this.y = y;
     }
 }
-
 class Maze {
 
     // Gives 1D index from 2D coords
@@ -74,6 +73,7 @@ class Maze {
     }
 
     // Gets all non-removed edges
+    // These edges have appropriate position based on cell coordinates which can be scaled
     getEdges() {
         let goodEdges = [];
         for (let i = 0; i < this.edges.length; i++) {
@@ -85,7 +85,7 @@ class Maze {
         return goodEdges;
     }
 
-
+    // Creates the basic structure of the maze
     constructor(n) {
         this.n = n;
         this.cells = [];

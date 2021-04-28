@@ -1,11 +1,12 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color } from 'three';
-import { Flower, Land } from 'objects';
+import { Scene, Color, TextGeometry, FontLoader } from 'three';
+import { Floor, Wall } from 'objects';
 import { BasicLights } from 'lights';
-import { Wall } from '../objects/Wall';
 import Maze from './Maze';
+import { getFont } from './helper';
 
 class SeedScene extends Scene {
+
     constructor() {
         // Call parent Scene() constructor
         super();
@@ -17,6 +18,11 @@ class SeedScene extends Scene {
             updateList: [],
         };
 
+
+        // Loading font for debug use later
+        // This has to be done synchronously for when we want to actually use the font loaded
+        const font = getFont();
+        console.log(font)
         // Set background to a nice color
         this.background = new Color(0x7ec0ee);
 
@@ -24,29 +30,16 @@ class SeedScene extends Scene {
         const lights = new BasicLights();
         this.add(lights);
 
-        // this doesn't work because the wall texture has a .bin buffer
-        // const wall = new Wall(this);
-        // this.add(wall);
 
         // Defines size of maze
-        const cell_width = 4;
-
+        const cellWidth = 4;
         const n = 10;
 
-        function index(u, v) {
-            return u + v * (n + 1);
-        }
-        this.index = index;
-
-        // Let's add all of the cells to the maze for visual understanding
-        let lands = [];
-        for (let x = 0; x < n; x++) {
-            for (let z = 0; z < n; z++) {
-                lands[index(x, z)] = new Land();
-                this.add(lands[index(x, z)]);
-                lands[index(x, z)].position.set(x * cell_width, 0, z * cell_width);
-            }
-        }
+        // Let's put a floor in the middle of the maze
+        let floor = new Floor();
+        this.add(floor);
+        floor.position.x = (cellWidth*n)/2
+        floor.position.z = (cellWidth*n)/2
 
         // Making a maze
         let maze = new Maze(n);
@@ -56,20 +49,31 @@ class SeedScene extends Scene {
         // Let's get the maze edges into the scene
         let walls = [];
         for (let i = 0; i < edges.length; i++) {
-            walls[i] = new Flower(this);
+            walls[i] = new Wall();
             if (edges[i].x_orientation == true) {
                 walls[i].rotation.y = Math.PI/2
             }
-            walls[i].position.x = edges[i].x * cell_width;
-            walls[i].position.z = edges[i].y * cell_width;
+            walls[i].position.x = edges[i].x * cellWidth;
+            walls[i].position.z = edges[i].y * cellWidth;
             this.add(walls[i]);
         }
 
-        // TODO add perimetter wall around square
+        // Add perimeter walls around maze square
+        // x: 0, z: 0.5 maze
+        let len = walls.length;
+        for (let i = len; i < len + n; i++) {
+            // from 0,0 to 0,maze
+            walls[i] = new Wall();
+            walls[i].position.x = 0; 
+            walls[i].position.z = i * cellWidth;
+            this.add(walls[i]);
+        }
+        // x: maze, z: 0.5 maze
         // TODO change walls and floor meshes and textures 
 
-
-
+        
+        let textModel = new TextGeometry('Hello World', font);
+        this.add(textModel);
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);

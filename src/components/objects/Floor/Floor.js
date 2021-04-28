@@ -1,15 +1,15 @@
 import { Group } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import MODEL from './Wall_03.gltf';
+import MODEL from './Floor.gltf';
 
-class Wall extends Group {
+class Floor extends Group {
     constructor() {
         // Call parent Group() constructor
         super();
 
         const loader = new GLTFLoader();
 
-        this.name = 'wall';
+        this.name = 'floor';
 
         loader.load(MODEL, (gltf) => {
             this.add(gltf.scene);
@@ -17,4 +17,4 @@ class Wall extends Group {
     }
 }
 
-export default Wall;
+export default Floor;
