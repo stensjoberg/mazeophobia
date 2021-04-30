@@ -11,6 +11,9 @@ import { WebGLRenderer, PerspectiveCamera, Vector3, Clock } from 'three';
 import { PlayerControls } from './PlayerControls.js'
 import { SeedScene } from 'scenes';
 
+// Debug boolean for setting debug settings across app
+const DEBUG = true;
+
 // Initialize core ThreeJS components
 const scene = new SeedScene();
 const camera = new PerspectiveCamera();
@@ -20,6 +23,10 @@ const clock = new Clock();
 
 // Set up camera
 camera.position.set(6, 3, -10);
+if (DEBUG) {
+camera.position.set(6, 50, -10);
+
+}
 camera.lookAt(new Vector3(0, 0, 0));
 
 // Set up renderer, canvas, and minor CSS adjustments
