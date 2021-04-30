@@ -13,6 +13,9 @@ class PlayerControls {
 		let isMovingBackward = false;
 		let isMovingLeft = false;
 		let isMovingRight = false;
+		// DEBUG
+		let isMovingUp = false;
+		let isMovingDown = false;
 
 		const euler = new Euler(0,0,0,'YXZ');
 		const vector = new Vector3();
@@ -47,6 +50,13 @@ class PlayerControls {
 				case "d":
 					isMovingRight = true;
 					break;
+				// DEBUG 
+				case "Shift":
+					isMovingDown = true;
+					break;
+				case " ":
+					isMovingUp = true;
+					break;
 			}
 
 		}
@@ -65,6 +75,13 @@ class PlayerControls {
 				case "d":
 					isMovingRight = false;
 					break;
+				// DEBUG 
+				case "Shift":
+					isMovingDown = false;
+					break
+				case " ":
+					isMovingUp = false;
+					break;
 			}
 		}
 
@@ -79,13 +96,21 @@ class PlayerControls {
 			camera.position.addScaledVector(vector, distance);
 		}
 
+		// TODO fix
+		function moveUp(distance) {
+			vector.setFromMatrixColumn(camera.matrix, 2);
+			camera.position.addScaledVector(vector, distance);
+		}
+
 		// update the player position
 		this.update = function(delta) {
 			velocity.x -= velocity.x * this.velocityFactor * delta;
 			velocity.z -= velocity.z * this.velocityFactor * delta;
+			velocity.y -= velocity.y * this.velocityFactor * delta;
 
 			direction.x = Number(isMovingRight) - Number(isMovingLeft);
 			direction.z = Number(isMovingForward) - Number(isMovingBackward);
+			direction.y = Number(isMovingUp) - Number(isMovingDown);
 			
 			if (isMovingForward || isMovingBackward) {
 				velocity.z -= direction.z * this.movementSpeed * delta;
@@ -94,9 +119,13 @@ class PlayerControls {
 			if (isMovingLeft || isMovingRight) {
 				velocity.x -= direction.x * this.movementSpeed * delta;
 			}
+			if (isMovingUp || isMovingDown) {
+				velocity.y -= direction.y * this.movementSpeed * delta;
+			}
 
 			moveForward(-velocity.z * delta);
 			moveRight(-velocity.x * delta);
+			moveUp(-velocity.y * delta);
 		}
 
 		this.lock = function() {
