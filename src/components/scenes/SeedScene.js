@@ -33,13 +33,13 @@ class SeedScene extends Scene {
         // PLAYER FLASHLIGHT
         // =================================================================================
         // Pretty weak and narrow per arguments
-        this.light = new SpotLight(0xffffff, 1, 40, Math.PI/10, 0.3);
+        this.flashlight = new SpotLight(0xffffff, 1, 40, Math.PI/10, 0.3);
         
-        //this.light.target = this.camera;
-        this.add(this.light);
+        //this.flashlight.target = this.camera;
+        this.add(this.flashlight);
         // Since we'll be updating the target position, it needs to be part of the scene
-        this.add(this.light.target);
-        this.updateLightPosition();
+        this.add(this.flashlight.target);
+        this.updateFlashlight();
 
         // =================================================================================
         // MAZE GENERATION
@@ -47,6 +47,14 @@ class SeedScene extends Scene {
         // Defines size of maze
         this.cellWidth = 4;
         this.n = 10;
+
+        // Player spawn already set at (0, 3, 0) in app.js
+        // Set finish spot at opposite diagonal end of maze
+        let finishLight = new PointLight(0xffffff, 2, 40, 0.2);
+        finishLight.position.set(this.cellWidth*(this.n - 1), 3, this.cellWidth*(this.n - 1));
+        this.add(finishLight);
+        this.add(new PointLightHelper(finishLight));
+
 
         // Let's put a floor ithis.n the middle of the maze
         let floor = new Floor();
@@ -56,7 +64,8 @@ class SeedScene extends Scene {
 
         // add perimiter walls
         this.walls = [];
-        //this.addPerimiter();
+        this.addPerimiter();
+
         // Making a maze
         let maze = new Maze(this.n);
         maze.runKruskals();
@@ -74,8 +83,6 @@ class SeedScene extends Scene {
         }
 
         // TODO change walls and floor meshes and textures 
-
-
 
         if (false) {
             this.wallText = [];
@@ -143,7 +150,7 @@ class SeedScene extends Scene {
         this.state.updateList.push(object);
     }
 
-    updateLightPosition() {
+    updateFlashlight() {
 
         // Get direction of camera to position light and save it 
         let dir = new Vector3();
@@ -153,18 +160,16 @@ class SeedScene extends Scene {
         // We set the light origin position to right behind our camera view 
         let lightPos = this.camera.position.clone()
         lightPos.addScaledVector(dir, -1);
-        this.light.position.copy(lightPos);
+        this.flashlight.position.copy(lightPos);
 
         // We readjust position to right in front of camera, this is our target
         lightPos.addScaledVector(dir, 3);
-        this.light.target.position.copy(lightPos);
-
+        this.flashlight.target.position.copy(lightPos);
+        console.log(this.camera.position)
     }
     update(timeStamp) {
-        const { rotationSpeed, updateList } = this.state;
-        // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
-        //this.light.position.copy(this.camera.position);
-        this.updateLightPosition();
+        const { updateList } = this.state;
+        this.updateFlashlight();
         // Call update for each object in the updateList
         for (const obj of updateList) {
             obj.update(timeStamp);

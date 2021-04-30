@@ -22,11 +22,11 @@ const renderer = new WebGLRenderer({ antialias: true });
 const clock = new Clock();
 
 // Set up camera
-camera.position.set(6, 3, -10);
+camera.position.set(0, 3, 0);
 if (DEBUG) {
     camera.position.set(6, 50, -10);
 }
-camera.lookAt(new Vector3(0, 0, 0));
+camera.lookAt(new Vector3(1, 3, 1));
 
 // Set up renderer, canvas, and minor CSS adjustments
 renderer.setPixelRatio(window.devicePixelRatio);
