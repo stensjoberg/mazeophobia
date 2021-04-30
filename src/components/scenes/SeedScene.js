@@ -7,6 +7,8 @@ import { addText, getFont } from './helper';
 
 class SeedScene extends Scene {
 
+    
+
     constructor() {
         // Call parent Scene() constructor
         super();
@@ -30,58 +32,101 @@ class SeedScene extends Scene {
         const lights = new BasicLights();
         this.add(lights);
 
-
         // Defines size of maze
-        const cellWidth = 4;
-        const n = 10;
+        this.cellWidth = 4;
+        this.n = 10;
 
-        // Let's put a floor in the middle of the maze
+        // Let's put a floor ithis.n the middle of the maze
         let floor = new Floor();
         this.add(floor);
-        floor.position.x = (cellWidth*n)/2
-        floor.position.z = (cellWidth*n)/2
+        floor.position.x = (this.cellWidth*this.n)/2;
+        floor.position.z = (this.cellWidth*this.n)/2;
 
+        // add perimiter walls
+        this.walls = [];
+        this.addPerimiter();
         // Making a maze
-        let maze = new Maze(n);
+        let maze = new Maze(this.n);
         maze.runKruskals();
         let edges = maze.getEdges();
 
         // Let's get the maze edges into the scene
-        let walls = [];
         for (let i = 0; i < edges.length; i++) {
-            walls[i] = new Wall();
+            this.walls[i] = new Wall();
             if (edges[i].x_orientation == true) {
-                walls[i].rotation.y = Math.PI/2
+                this.walls[i].rotation.y = Math.PI/2
             }
-            walls[i].position.x = edges[i].x * cellWidth;
-            walls[i].position.z = edges[i].y * cellWidth;
-            this.add(walls[i]);
+            this.walls[i].position.x = edges[i].x * this.cellWidth;
+            this.walls[i].position.z = edges[i].y * this.cellWidth;
+            this.add(this.walls[i]);
         }
 
-        // Add perimeter walls around maze square
-        // x: 0, z: 0.5 maze
-        let len = walls.length;
-        for (let i = len; i < len + n; i++) {
-            // from 0,0 to 0,maze
-            walls[i] = new Wall();
-            walls[i].position.x = 0; 
-            walls[i].position.z = i * cellWidth;
-            this.add(walls[i]);
-        }
-        // x: maze, z: 0.5 maze
+
+
+
         // TODO change walls and floor meshes and textures 
         
-        let wallText = [];
+        this.wallText = [];
         font.then(font => {
-            for (let i = 0; i < walls.length; i++) {
-                console.log(walls[i])
-                wallText[i] = addText(font, walls[i].id.toString(), walls[i].position.x, walls[i].position.y + 2*cellWidth, walls[i].position.z, walls[i].x_orientation);
-                this.add(wallText[i]);
+            for (let i = 0; i < this.walls.length; i++) {
+                this.wallText[i] = addText(font, this.walls[i].id.toString(), this.walls[i].position.x, this.walls[i].position.y + 2*this.cellWidth, this.walls[i].position.z, this.walls[i].x_orientation);
+                this.add(this.wallText[i]);
             }
         });
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
+    }
+
+    addPerimiter() {
+        // Add perimeter walls around maze square
+        // x: 0, z: 0.5 maze
+        let len = this.walls.length;
+        for (let i = len; i < len + this.n; i++) {
+            // from 0,0 to 0,maze
+            this.walls[i] = new Wall();
+            // Close side of the maze
+            this.walls[i].position.x = -this.cellWidth/2; 
+            this.walls[i].position.z = (i - len) * this.cellWidth;
+            this.walls[i].rotation.y = Math.PI/2
+            this.add(this.walls[i]);
+        }
+
+        // x: maze, z: 0.5 maze
+        len = this.walls.length;
+        for (let i = len; i < len + this.n; i++) {
+            // from 0,0 to 0,maze
+            this.walls[i] = new Wall();
+            // Far side of the maze
+            this.walls[i].position.x = (this.n*this.cellWidth) - this.cellWidth/2; 
+            this.walls[i].position.z = (i - len)*this.cellWidth;
+            this.walls[i].rotation.y = Math.PI/2
+            this.add(this.walls[i]);
+        }
+        
+        // x: 0.5 maze, z: 0
+        len = this.walls.length;
+        for (let i = len; i < len + this.n; i++) {
+            // from 0,0 to 0,maze
+            this.walls[i] = new Wall();
+            // Far side of the maze
+            this.walls[i].position.x = (i - len) * this.cellWidth;
+            this.walls[i].position.z = -this.cellWidth/2;
+            this.walls[i].rotation.y = 0;
+            this.add(this.walls[i]);
+        }
+
+        // x: 0.5 maze, z: maze 
+        len = this.walls.length;
+        for (let i = len; i < len + this.n; i++) {
+            // from 0,0 to 0,maze
+            this.walls[i] = new Wall();
+            // Far side of the maze
+            this.walls[i].position.x = (i - len)*this.cellWidth;
+            this.walls[i].position.z = (this.n*this.cellWidth) - this.cellWidth/2;
+            this.walls[i].rotation.y = 0;
+            this.add(this.walls[i]);
+        }
     }
 
     addToUpdateList(object) {
