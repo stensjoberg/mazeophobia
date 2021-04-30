@@ -1,6 +1,6 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color } from 'three';
-import { Floor, Wall } from 'objects';
+import { Scene, Color, SpotLight, SpotLightHelper, PointLight, PointLightHelper, Vector3} from 'three';
+import { Floor, Wall, } from 'objects';
 import { BasicLights } from 'lights';
 import Maze from './Maze';
 import { addText, getFont } from './helper';
@@ -9,7 +9,7 @@ class SeedScene extends Scene {
 
     
 
-    constructor() {
+    constructor(camera) {
         // Call parent Scene() constructor
         super();
 
@@ -19,8 +19,8 @@ class SeedScene extends Scene {
             rotationSpeed: 1,
             updateList: [],
         };
-
-
+        this.camera = camera;
+        this.add(this.camera);
         // Loading font for debug use later
         // This has to be done synchronously for when we want to actually use the font loaded
         const font = getFont();
@@ -28,9 +28,27 @@ class SeedScene extends Scene {
         // Set background to a nice color
         this.background = new Color(0x7ec0ee);
 
-        // Add meshes to scene
-        const lights = new BasicLights();
-        this.add(lights);
+        // Add spotlight to scene
+        
+        this.light = new PointLight(0xffffff);
+        // Basic shadow casting for spotlight 
+        
+        /*
+        this.light.castShadow = true;
+        this.light.shadow.mapSize.width = 1024;
+        this.light.shadow.mapSize.height = 1024;
+
+        this.light.shadow.camera.near = 500;
+        this.light.shadow.camera.far = 4000;
+        this.light.shadow.camera.fov = 30;
+        */ 
+        //this.light.target = this.camera;
+        this.light.position.set(0, 0, 0);
+        this.camera.add(this.light);
+
+        // DEBUG goodness
+        this.camera.add(new PointLightHelper(this.light))
+
 
         // Defines size of maze
         this.cellWidth = 4;
@@ -61,19 +79,19 @@ class SeedScene extends Scene {
             this.add(this.walls[i]);
         }
 
-
-
-
         // TODO change walls and floor meshes and textures 
-        
-        this.wallText = [];
-        font.then(font => {
-            for (let i = 0; i < this.walls.length; i++) {
-                this.wallText[i] = addText(font, this.walls[i].id.toString(), this.walls[i].position.x, this.walls[i].position.y + 2*this.cellWidth, this.walls[i].position.z, this.walls[i].x_orientation);
-                this.add(this.wallText[i]);
-            }
-        });
 
+
+
+        if (false) {
+            this.wallText = [];
+            font.then(font => {
+                for (let i = 0; i < this.walls.length; i++) {
+                    this.wallText[i] = addText(font, this.walls[i].id.toString(), this.walls[i].position.x, this.walls[i].position.y + 2*this.cellWidth, this.walls[i].position.z, this.walls[i].x_orientation);
+                    this.add(this.wallText[i]);
+                }
+            });
+        }
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }
@@ -133,10 +151,17 @@ class SeedScene extends Scene {
         this.state.updateList.push(object);
     }
 
+    updateLightPosition() {
+        let direction = new Vector3();
+        this.camera.getWorldDirection(direction);
+        direction.normalize();
+        this.light.position.set(this.camera.position.x - direction.x, this.camera.position.y - direction.y, this.camera.position.z - 1);
+    }
     update(timeStamp) {
         const { rotationSpeed, updateList } = this.state;
         // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
 
+        //this.updateLightPosition();
         // Call update for each object in the updateList
         for (const obj of updateList) {
             obj.update(timeStamp);
