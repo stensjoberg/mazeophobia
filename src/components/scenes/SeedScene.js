@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, SpotLight, SpotLightHelper, PointLight, PointLightHelper, Vector3} from 'three';
+import { Scene, Color, SpotLight, SpotLightHelper, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D} from 'three';
 import { Floor, Wall, } from 'objects';
 import { BasicLights } from 'lights';
 import Maze from './Maze';
@@ -15,41 +15,35 @@ class SeedScene extends Scene {
 
         // Init state
         this.state = {
-            gui: new Dat.GUI(), // Create GUI for scene
-            rotationSpeed: 1,
             updateList: [],
         };
+
+        // Add camera to scene for flashlight tracking
         this.camera = camera;
         this.add(this.camera);
+
         // Loading font for debug use later
-        // This has to be done synchronously for when we want to actually use the font loaded
         const font = getFont();
 
-        // Set background to a nice color
+        // Set background to light blue
         this.background = new Color(0x7ec0ee);
 
-        // Add spotlight to scene
         
-        this.light = new PointLight(0xffffff);
-        // Basic shadow casting for spotlight 
+        // =================================================================================
+        // PLAYER FLASHLIGHT
+        // =================================================================================
+        // Pretty weak and narrow per arguments
+        this.light = new SpotLight(0xffffff, 1, 40, Math.PI/10, 0.3);
         
-        /*
-        this.light.castShadow = true;
-        this.light.shadow.mapSize.width = 1024;
-        this.light.shadow.mapSize.height = 1024;
-
-        this.light.shadow.camera.near = 500;
-        this.light.shadow.camera.far = 4000;
-        this.light.shadow.camera.fov = 30;
-        */ 
         //this.light.target = this.camera;
-        this.light.position.set(0, 0, 0);
-        this.camera.add(this.light);
+        this.add(this.light);
+        // Since we'll be updating the target position, it needs to be part of the scene
+        this.add(this.light.target);
+        this.updateLightPosition();
 
-        // DEBUG goodness
-        this.camera.add(new PointLightHelper(this.light))
-
-
+        // =================================================================================
+        // MAZE GENERATION
+        // =================================================================================
         // Defines size of maze
         this.cellWidth = 4;
         this.n = 10;
@@ -62,7 +56,7 @@ class SeedScene extends Scene {
 
         // add perimiter walls
         this.walls = [];
-        this.addPerimiter();
+        //this.addPerimiter();
         // Making a maze
         let maze = new Maze(this.n);
         maze.runKruskals();
@@ -92,8 +86,6 @@ class SeedScene extends Scene {
                 }
             });
         }
-        // Populate GUI
-        this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }
 
     addPerimiter() {
@@ -152,16 +144,27 @@ class SeedScene extends Scene {
     }
 
     updateLightPosition() {
-        let direction = new Vector3();
-        this.camera.getWorldDirection(direction);
-        direction.normalize();
-        this.light.position.set(this.camera.position.x - direction.x, this.camera.position.y - direction.y, this.camera.position.z - 1);
+
+        // Get direction of camera to position light and save it 
+        let dir = new Vector3();
+        this.camera.getWorldDirection(dir);
+        dir.normalize();
+
+        // We set the light origin position to right behind our camera view 
+        let lightPos = this.camera.position.clone()
+        lightPos.addScaledVector(dir, -1);
+        this.light.position.copy(lightPos);
+
+        // We readjust position to right in front of camera, this is our target
+        lightPos.addScaledVector(dir, 3);
+        this.light.target.position.copy(lightPos);
+
     }
     update(timeStamp) {
         const { rotationSpeed, updateList } = this.state;
         // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
-
-        //this.updateLightPosition();
+        //this.light.position.copy(this.camera.position);
+        this.updateLightPosition();
         // Call update for each object in the updateList
         for (const obj of updateList) {
             obj.update(timeStamp);
