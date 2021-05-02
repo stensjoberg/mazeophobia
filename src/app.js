@@ -43,7 +43,6 @@ controls.enablePan = false;
 controls.minDistance = 4;
 controls.maxDistance = 16;
 controls.update();*/
-controls.lock();
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {

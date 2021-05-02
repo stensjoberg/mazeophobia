@@ -8,6 +8,7 @@ class PlayerControls {
 
 		this.movementSpeed = 100.0;
 		this.velocityFactor = 10.0;
+		this.isLocked = false;
 
 		let isMovingForward = false;
 		let isMovingBackward = false;
@@ -102,6 +103,14 @@ class PlayerControls {
 			camera.position.addScaledVector(vector, distance);
 		}
 
+		function onPointerlockChange() {
+
+		}
+
+		function onPointerlockError() {
+			console.error("Unable to use pointer lock API");
+		}
+
 		// update the player position
 		this.update = function(delta) {
 			velocity.x -= velocity.x * this.velocityFactor * delta;
@@ -128,15 +137,20 @@ class PlayerControls {
 			moveUp(-velocity.y * delta);
 		}
 
-		this.lock = function() {
-			this.domElement.requestPointerLock();
+		function lock() {
+			domElement.requestPointerLock = domElement.requestPointerLock || domElement.mozRequestPointerLock || domElement.webkitRequestPointerLock;
+			domElement.requestPointerLock();
 		}
 
-		this.unlock = function() {
-			this.domElement.exitPointerLock();
+		function unlock() {
+			domElement.exitPointerLock();
 		}
 		
+		this.domElement.addEventListener("click", lock);
 		this.domElement.addEventListener("mousemove", onMouseMove);
+		this.domElement.addEventListener("pointerlockchange", onPointerlockChange);
+		this.domElement.addEventListener("pointerlockerror", onPointerlockError);
+
 		window.addEventListener("keydown", onKeyDown);
 		window.addEventListener("keyup", onKeyUp);
 	}
