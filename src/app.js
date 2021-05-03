@@ -6,7 +6,7 @@
  * handles window resizes.
  *
  */
-import { WebGLRenderer, PerspectiveCamera, Vector3, Clock } from 'three';
+import { WebGLRenderer, PerspectiveCamera, Vector3, Clock, Box3 } from 'three';
 //import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { PlayerControls } from './PlayerControls.js'
 import { SeedScene } from 'scenes';
@@ -28,6 +28,11 @@ if (DEBUG) {
 }
 camera.lookAt(new Vector3(1, 3, 1));
 
+// bounding box for camera
+const playerBox = new Box3();
+camera.add(playerBox);
+//console.log(camera)
+
 // Set up renderer, canvas, and minor CSS adjustments
 renderer.setPixelRatio(window.devicePixelRatio);
 const canvas = renderer.domElement;
@@ -43,11 +48,14 @@ controls.enablePan = false;
 controls.minDistance = 4;
 controls.maxDistance = 16;
 controls.update();*/
-controls.lock();
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
-    controls.update(clock.getDelta());
+    // TODO: push camera position outside of bounding box rather than stop
+    if (!scene.findCollisions(camera)) {
+
+        controls.update(clock.getDelta());
+    }
     renderer.render(scene, camera);
     scene.update && scene.update(timeStamp);
     window.requestAnimationFrame(onAnimationFrameHandler);
