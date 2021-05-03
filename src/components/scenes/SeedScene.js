@@ -194,12 +194,12 @@ class SeedScene extends Scene {
         let max;
 
         if (rotate) {
-            min = new Vector3(xPos, 0, zPos);
-            max = new Vector3(xPos + 1, 10, zPos + this.cellWidth);
+            min = new Vector3(xPos - 1, 0, zPos - this.cellWidth / 2);
+            max = new Vector3(xPos + 1, 10, zPos + this.cellWidth / 2);
         }
         else {
-            min = new Vector3(xPos , 0, zPos);
-            max = new Vector3(xPos + (this.cellWidth), 10, zPos + 1);
+            min = new Vector3(xPos - (this.cellWidth / 2), 0, zPos - 1);
+            max = new Vector3(xPos + (this.cellWidth / 2), 10, zPos + 1);
         }
 
         return new Box3(min, max);
@@ -208,7 +208,7 @@ class SeedScene extends Scene {
     findCollisions(camera) {
         for (let i = 0; i < this.walls.length; i++) {
             if (this.walls[i].bb.containsPoint(camera.position)) {
-                console.log(true);
+                return true;
             }
         }
         //debugger

@@ -51,10 +51,13 @@ controls.update();*/
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
-    controls.update(clock.getDelta());
+    // TODO: push camera position outside of bounding box rather than stop
+    if (!scene.findCollisions(camera)) {
+
+        controls.update(clock.getDelta());
+    }
     renderer.render(scene, camera);
     scene.update && scene.update(timeStamp);
-    scene.findCollisions(camera)
     window.requestAnimationFrame(onAnimationFrameHandler);
 };
 window.requestAnimationFrame(onAnimationFrameHandler);
