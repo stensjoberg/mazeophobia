@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, SpotLight, SpotLightHelper, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D} from 'three';
+import { Scene, Color, SpotLight, SpotLightHelper, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3} from 'three';
 import { Floor, Wall, } from 'objects';
 import { BasicLights } from 'lights';
 import Maze from './Maze';
@@ -74,11 +74,16 @@ class SeedScene extends Scene {
         // Let's get the maze edges into the scene
         for (let i = 0; i < edges.length; i++) {
             this.walls[i] = new Wall();
-            if (edges[i].x_orientation == true) {
-                this.walls[i].rotation.y = Math.PI/2
-            }
             this.walls[i].position.x = edges[i].x * this.cellWidth;
             this.walls[i].position.z = edges[i].y * this.cellWidth;
+            if (edges[i].x_orientation == true) {
+                this.walls[i].rotation.y = Math.PI/2
+                this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
+            }
+            else {
+                this.walls[i].rotation.y = 0
+                this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, false);
+            }
             this.add(this.walls[i]);
         }
 
@@ -106,6 +111,8 @@ class SeedScene extends Scene {
             this.walls[i].position.x = -this.cellWidth/2; 
             this.walls[i].position.z = (i - len) * this.cellWidth;
             this.walls[i].rotation.y = Math.PI/2
+
+            this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
             this.add(this.walls[i]);
         }
 
@@ -118,6 +125,8 @@ class SeedScene extends Scene {
             this.walls[i].position.x = (this.n*this.cellWidth) - this.cellWidth/2; 
             this.walls[i].position.z = (i - len)*this.cellWidth;
             this.walls[i].rotation.y = Math.PI/2
+
+            this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
             this.add(this.walls[i]);
         }
         
@@ -130,6 +139,8 @@ class SeedScene extends Scene {
             this.walls[i].position.x = (i - len) * this.cellWidth;
             this.walls[i].position.z = -this.cellWidth/2;
             this.walls[i].rotation.y = 0;
+
+            this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, false);
             this.add(this.walls[i]);
         }
 
@@ -142,6 +153,8 @@ class SeedScene extends Scene {
             this.walls[i].position.x = (i - len)*this.cellWidth;
             this.walls[i].position.z = (this.n*this.cellWidth) - this.cellWidth/2;
             this.walls[i].rotation.y = 0;
+
+            this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, false);
             this.add(this.walls[i]);
         }
     }
@@ -165,7 +178,7 @@ class SeedScene extends Scene {
         // We readjust position to right in front of camera, this is our target
         lightPos.addScaledVector(dir, 3);
         this.flashlight.target.position.copy(lightPos);
-        console.log(this.camera.position)
+        //console.log(this.camera.position)
     }
     update(timeStamp) {
         const { updateList } = this.state;
@@ -174,6 +187,31 @@ class SeedScene extends Scene {
         for (const obj of updateList) {
             obj.update(timeStamp);
         }
+    }
+
+    calculateBoundingBox(xPos, zPos, rotate) {
+        let min;
+        let max;
+
+        if (rotate) {
+            min = new Vector3(xPos, 0, zPos);
+            max = new Vector3(xPos + 1, 10, zPos + this.cellWidth);
+        }
+        else {
+            min = new Vector3(xPos , 0, zPos);
+            max = new Vector3(xPos + (this.cellWidth), 10, zPos + 1);
+        }
+
+        return new Box3(min, max);
+    }
+
+    findCollisions(camera) {
+        for (let i = 0; i < this.walls.length; i++) {
+            if (this.walls[i].bb.containsPoint(camera.position)) {
+                console.log(true);
+            }
+        }
+        //debugger
     }
 }
 
