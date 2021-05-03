@@ -50,10 +50,11 @@ class SeedScene extends Scene {
 
         // Player spawn already set at (0, 3, 0) in app.js
         // Set finish spot at opposite diagonal end of maze
-        let finishLight = new PointLight(0xffffff, 2, 40, 0.2);
-        finishLight.position.set(this.cellWidth*(this.n - 1), 3, this.cellWidth*(this.n - 1));
-        this.add(finishLight);
-        this.add(new PointLightHelper(finishLight));
+        // let finishLight = new PointLight(0xffffff, 2, 40, 0.2);
+        // finishLight.position.set(this.cellWidth*(this.n - 1), 3, this.cellWidth*(this.n - 1));
+        // this.add(finishLight);
+        // this.add(new PointLightHelper(finishLight));
+        // TODO add new finish beacon
 
 
         // Let's put a floor ithis.n the middle of the maze
