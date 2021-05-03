@@ -33,7 +33,9 @@ class SeedScene extends Scene {
         // PLAYER FLASHLIGHT
         // =================================================================================
         // Pretty weak and narrow per arguments
-        this.flashlight = new SpotLight(0xffffff, 1, 40, Math.PI/10, 0.3);
+        // TODO remove DEBUG
+        //this.flashlight = new SpotLight(0xffffff, 1, 40, Math.PI/10, 0.3);
+        this.flashlight = new SpotLight(0xffffff, 8, 400, Math.PI/2, 0.3);
         
         //this.flashlight.target = this.camera;
         this.add(this.flashlight);
@@ -58,25 +60,33 @@ class SeedScene extends Scene {
 
 
         // Let's put a floor ithis.n the middle of the maze
-        let floor = new Floor();
+        const material = new MeshLambertMaterial( {color: 0x1c1c1c } );
+        let geometry = new BoxGeometry( this.cellWidth*(this.n + 2), this.cellWidth/8, this.cellWidth*(this.n + 2));
+
+        let floor = new Mesh(geometry, material)
         this.add(floor);
         floor.position.x = (this.cellWidth*this.n)/2;
         floor.position.z = (this.cellWidth*this.n)/2;
 
+        // Setup for wall creation
+        geometry = new BoxGeometry( this.cellWidth, 4*this.cellWidth, this.cellWidth/8 );
+
         // add perimiter walls
         this.walls = [];
-        this.addPerimiter();
+        this.addPerimiter(geometry, material);
 
         // Making a maze
         let maze = new Maze(this.n);
         maze.runKruskals();
         let edges = maze.getEdges();
 
+
         // Let's get the maze edges into the scene
         for (let i = 0; i < edges.length; i++) {
-            this.walls[i] = new Wall();
+            this.walls[i] = new Mesh( geometry, material );
             this.walls[i].position.x = edges[i].x * this.cellWidth;
             this.walls[i].position.z = edges[i].y * this.cellWidth;
+            this.walls[i].position.y = 2*this.cellWidth;
             if (edges[i].x_orientation == true) {
                 this.walls[i].rotation.y = Math.PI/2
                 this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
@@ -101,16 +111,17 @@ class SeedScene extends Scene {
         }
     }
 
-    addPerimiter() {
+    addPerimiter(geometry, material) {
         // Add perimeter walls around maze square
         // x: 0, z: 0.5 maze
         let len = this.walls.length;
         for (let i = len; i < len + this.n; i++) {
             // from 0,0 to 0,maze
-            this.walls[i] = new Wall();
+            this.walls[i] = new Mesh( geometry, material );
             // Close side of the maze
             this.walls[i].position.x = -this.cellWidth/2; 
             this.walls[i].position.z = (i - len) * this.cellWidth;
+            this.walls[i].position.y = 2*this.cellWidth;
             this.walls[i].rotation.y = Math.PI/2
 
             this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
@@ -121,10 +132,11 @@ class SeedScene extends Scene {
         len = this.walls.length;
         for (let i = len; i < len + this.n; i++) {
             // from 0,0 to 0,maze
-            this.walls[i] = new Wall();
+            this.walls[i] = new Mesh( geometry, material );
             // Far side of the maze
             this.walls[i].position.x = (this.n*this.cellWidth) - this.cellWidth/2; 
             this.walls[i].position.z = (i - len)*this.cellWidth;
+            this.walls[i].position.y = 2*this.cellWidth;
             this.walls[i].rotation.y = Math.PI/2
 
             this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
@@ -135,10 +147,11 @@ class SeedScene extends Scene {
         len = this.walls.length;
         for (let i = len; i < len + this.n; i++) {
             // from 0,0 to 0,maze
-            this.walls[i] = new Wall();
+            this.walls[i] = new Mesh( geometry, material );
             // Far side of the maze
             this.walls[i].position.x = (i - len) * this.cellWidth;
             this.walls[i].position.z = -this.cellWidth/2;
+            this.walls[i].position.y = 2*this.cellWidth;
             this.walls[i].rotation.y = 0;
 
             this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, false);
@@ -149,10 +162,12 @@ class SeedScene extends Scene {
         len = this.walls.length;
         for (let i = len; i < len + this.n; i++) {
             // from 0,0 to 0,maze
-            this.walls[i] = new Wall();
+            this.walls[i] = new Mesh( geometry, material );
             // Far side of the maze
             this.walls[i].position.x = (i - len)*this.cellWidth;
             this.walls[i].position.z = (this.n*this.cellWidth) - this.cellWidth/2;
+            this.walls[i].position.y = 2*this.cellWidth;
+
             this.walls[i].rotation.y = 0;
 
             this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, false);
