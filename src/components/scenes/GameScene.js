@@ -73,7 +73,7 @@ class GameScene extends Scene {
         floor.position.z = (this.cellWidth*this.n)/2;
 
         // Setup for wall creation
-        geometry = new BoxGeometry( this.cellWidth, 4*this.cellWidth, this.cellWidth/8 );
+        geometry = new BoxGeometry( 9/8*this.cellWidth, 4*this.cellWidth, this.cellWidth/8 );
 
         // add perimiter walls
         this.walls = [];
