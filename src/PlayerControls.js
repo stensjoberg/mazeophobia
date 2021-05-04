@@ -6,7 +6,7 @@ class PlayerControls {
 	constructor(camera, domElement) {
 		this.domElement = domElement;
 
-		this.movementSpeed = 100.0;
+		this.movementSpeed = 25.0;
 		this.velocityFactor = 10.0;
 		this.isLocked = false;
 
