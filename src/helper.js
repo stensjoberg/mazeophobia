@@ -1,5 +1,6 @@
 import { FontLoader, TextGeometry, MeshLambertMaterial, Mesh, MeshBasicMaterial } from 'three';
-import { debug } from 'constants'
+import { debug } from './constants'
+
 export function getFont() {
     const floader = new FontLoader();
     return floader.loadAsync("src/components/fonts/Inconsolata_Condensed_SemiBold_Regular.json");
