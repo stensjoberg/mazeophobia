@@ -11,3 +11,8 @@
 - End Screen
 - Win scenario
 - Ambiance
+
+## Technical Stuff
+
+- Add clean up functions to scenes 
+- Refactor gamescene with each element as own object
