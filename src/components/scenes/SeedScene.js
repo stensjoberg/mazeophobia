@@ -1,5 +1,6 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, SpotLight, SpotLightHelper, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3} from 'three';
+import { Scene, Color, SpotLight, SpotLightHelper, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial} from 'three';
+import { debug } from '../../constants';
 import { Floor, Wall, } from 'objects';
 import { BasicLights } from 'lights';
 import Maze from './Maze';
@@ -33,9 +34,12 @@ class SeedScene extends Scene {
         // PLAYER FLASHLIGHT
         // =================================================================================
         // Pretty weak and narrow per arguments
-        // TODO remove DEBUG
-        //this.flashlight = new SpotLight(0xffffff, 1, 40, Math.PI/10, 0.3);
-        this.flashlight = new SpotLight(0xffffff, 8, 400, Math.PI/2, 0.3);
+        if (debug.flashlight) {
+            this.flashlight = new SpotLight(0xffffff, 8, 400, Math.PI/2, 0.3);
+        }
+        else {
+            this.flashlight = new SpotLight(0xffffff, 2, 40, Math.PI/8, 0.6);
+        }
         
         //this.flashlight.target = this.camera;
         this.add(this.flashlight);
@@ -60,7 +64,7 @@ class SeedScene extends Scene {
 
 
         // Let's put a floor ithis.n the middle of the maze
-        const material = new MeshLambertMaterial( {color: 0x1c1c1c } );
+        const material = new MeshPhongMaterial( {color: 0x1c1c1c } );
         let geometry = new BoxGeometry( this.cellWidth*(this.n + 2), this.cellWidth/8, this.cellWidth*(this.n + 2));
 
         let floor = new Mesh(geometry, material)
