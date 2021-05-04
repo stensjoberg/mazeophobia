@@ -10,7 +10,8 @@ import { WebGLRenderer, PerspectiveCamera, Vector3, Clock, Box3, Scene } from 't
 //import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { PlayerControls } from './PlayerControls.js'
 import { GameScene, BeginScene } from 'scenes';
-import { debug } from './constants.js';
+import { debug, SceneTypes } from './constants';
+import { log } from './helper'
 
 // Initialize core ThreeJS components
 const camera = new PerspectiveCamera();
@@ -19,7 +20,7 @@ const controls = new PlayerControls(camera, document.body);
 const renderer = new WebGLRenderer({ antialias: true });
 const clock = new Clock();
 
-// let beginScene = new BeginScene();
+let beginScene = new BeginScene();
 
 // Set up camera
 camera.position.set(0, 3, 0);
@@ -85,29 +86,37 @@ function handleMovement() {
     }
 }
 
+// ========================================================================
+// Scene Transitions
+// ========================================================================
+
+const startGameScene = () => {
+    console.log('Killing begin scene')
+    log('Killing begin scene')
+    // scene.kill();
+    // scene = new GameScene();
+};
+
+let scene = new BeginScene(startGameScene);
+// ========================================================================
+// Rendering
+// ========================================================================
+
 // Actually renders scene and runs updates
-function renderScene(scene, timeStamp) {
-    renderer.render(scene, camera);
-    scene.update && scene.update(timeStamp);
+function renderScene(s, timeStamp) {
+    renderer.render(s, camera);
+    s.update && s.update(timeStamp);
 }
 
-const SceneStatus = {
-    Game: 0,
-    Begin: 1,
-    End: 2
-}
-
-controls.enable();
-let currScene = SceneStatus.Game;
-// Render loop
+// Ye olde game loop
 const onAnimationFrameHandler = (timeStamp) => {
-    if (currScene == SceneStatus.Game) {
+    if (scene.type === SceneTypes.Game) {
         handleMovement();
-        renderScene(gameScene, timeStamp);
+        renderScene(scene, timeStamp);
     }
 
-    if (currScene == SceneStatus.Begin) {
-        renderScene(beginScene, timeStamp);
+    if (scene.type === SceneTypes.Begin) {
+        renderScene(scene, timeStamp);
     }
     window.requestAnimationFrame(onAnimationFrameHandler);
 };

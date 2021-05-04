@@ -1,29 +1,28 @@
-import { startMenu } from '../../constants';
+import { startMenu, SceneTypes } from '../../constants';
 import { Scene } from 'three'
 
 class BeginScene extends Scene {
 
     
 
-    constructor() {
+    constructor(startGameCallback) {
         
         super();
+        this.type = SceneTypes.Begin;
 
-        // Make menu
-        this.menuElementes = [];
-        this.menuElementes.push(this.makeTextElement(startMenu.titleText));
-        this.menuElementes.push(this.makeButton(startMenu.startButtonText, this.testFunction));
+        // Let's make a menu
+        this.menuElements = [];
+        this.menuElements.push(this.makeTextElement(startMenu.titleText));
+        this.menuElements.push(this.makeButton(startMenu.startButtonText, startGameCallback));
     }
 
-    testFunction() {
-        console.log("Game starting...")
-    }
+    
 
     makeButton(text, clickCallback) {
         let button = document.createElement('button');
         document.body.appendChild(button);
         button.innerHTML = text;
-        button.onClick = clickCallback;
+        button.onclick = clickCallback;
         return button;
     }
 
@@ -34,7 +33,12 @@ class BeginScene extends Scene {
         return textElem;
     }
 
-
+    kill() {
+        for (let e of this.menuElements) {
+            e.remove();
+        }
+        this.dispose();
+    }
 }
 
 export default BeginScene;
