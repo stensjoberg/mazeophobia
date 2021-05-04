@@ -183,6 +183,8 @@ class PlayerControls {
 		window.removeEventListener("keydown", this.onKeyDown.bind(this));
 		window.removeEventListener("keyup", this.onKeyUp.bind(this));
 	}
+
+
 	enable() {
 		if (!this.enabled) {
 			log('Enabling player controls')
