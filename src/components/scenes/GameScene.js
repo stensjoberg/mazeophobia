@@ -6,7 +6,7 @@ import { BasicLights } from 'lights';
 import Maze from './Maze';
 import { addText, getFont } from './helper';
 
-class SeedScene extends Scene {
+class GameScene extends Scene {
 
     
 
@@ -235,4 +235,4 @@ class SeedScene extends Scene {
     }
 }
 
-export default SeedScene;
+export default GameScene;

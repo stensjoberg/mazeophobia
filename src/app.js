@@ -9,14 +9,14 @@
 import { WebGLRenderer, PerspectiveCamera, Vector3, Clock, Box3 } from 'three';
 //import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { PlayerControls } from './PlayerControls.js'
-import { SeedScene } from 'scenes';
+import { GameScene } from 'scenes';
 
 // Debug boolean for setting debug settings across app
 const DEBUG = false;
 
 // Initialize core ThreeJS components
 const camera = new PerspectiveCamera();
-const scene = new SeedScene(camera);
+const scene = new GameScene(camera);
 const controls = new PlayerControls(camera, document.body);
 const renderer = new WebGLRenderer({ antialias: true });
 const clock = new Clock();
