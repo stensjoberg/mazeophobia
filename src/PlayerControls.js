@@ -1,7 +1,7 @@
 // Adapted from https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/PointerLockControls.js
 
 import { Euler, Vector3 } from 'three';
-
+import { log } from './helper'
 class PlayerControls {
 	constructor(camera, domElement) {
 		this.camera = camera;
@@ -21,7 +21,6 @@ class PlayerControls {
 		this.isMovingUp = false;
 		this.isMovingDown = false;
 
-		this.euler = new Euler(0,0,0,'YXZ');
 		this.vector = new Vector3();
 		this.velocity = new Vector3();
 		this.direction = new Vector3();
@@ -30,34 +29,36 @@ class PlayerControls {
 
 		
 
-		// update the player position
-		this.update = function(delta) {
-			this.velocity.x -= this.velocity.x * this.velocityFactor * delta;
-			this.velocity.z -= this.velocity.z * this.velocityFactor * delta;
-			this.velocity.y -= this.velocity.y * this.velocityFactor * delta;
-
-			this.direction.x = Number(this.isMovingRight) - Number(this.isMovingLeft);
-			this.direction.z = Number(this.isMovingForward) - Number(this.isMovingBackward);
-			this.direction.y = Number(this.isMovingUp) - Number(this.isMovingDown);
-			
-			if (this.isMovingForward || this.isMovingBackward) {
-				this.velocity.z -= this.direction.z * this.movementSpeed * delta;
-
-			}
-			if (this.isMovingLeft || this.isMovingRight) {
-				this.velocity.x -= this.direction.x * this.movementSpeed * delta;
-			}
-			if (this.isMovingUp || this.isMovingDown) {
-				this.velocity.y -= this.direction.y * this.movementSpeed * delta;
-			}
-
-			this.moveForward(-this.velocity.z * delta);
-			this.moveRight(-this.velocity.x * delta);
-			this.moveUp(-this.velocity.y * delta);
-		}
+		
 
 	}
 
+	// update the player position
+	update(delta) {
+		this.velocity.x -= this.velocity.x * this.velocityFactor * delta;
+		this.velocity.z -= this.velocity.z * this.velocityFactor * delta;
+		this.velocity.y -= this.velocity.y * this.velocityFactor * delta;
+
+		this.direction.x = Number(this.isMovingRight) - Number(this.isMovingLeft);
+		this.direction.z = Number(this.isMovingForward) - Number(this.isMovingBackward);
+		this.direction.y = Number(this.isMovingUp) - Number(this.isMovingDown);
+		
+		if (this.isMovingForward || this.isMovingBackward) {
+			this.velocity.z -= this.direction.z * this.movementSpeed * delta;
+
+		}
+		if (this.isMovingLeft || this.isMovingRight) {
+			this.velocity.x -= this.direction.x * this.movementSpeed * delta;
+		}
+		if (this.isMovingUp || this.isMovingDown) {
+			this.velocity.y -= this.direction.y * this.movementSpeed * delta;
+		}
+
+		this.moveForward(-this.velocity.z * delta);
+		this.moveRight(-this.velocity.x * delta);
+		this.moveUp(-this.velocity.y * delta);
+	}
+	
 	unlock() {
 		domElement.exitPointerLock();
 	}		
@@ -65,14 +66,16 @@ class PlayerControls {
 	onMouseMove(event) {
 		const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 		const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-		
-		this.euler.setFromQuaternion(this.camera.quaternion);
 
-		this.euler.y -= movementX * 0.002;
-		this.euler.x -= movementY * 0.002;
-		this.euler.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, this.euler.x));
+		let euler = new Euler(0, 0,0, "YXZ");
 
-		this.camera.quaternion.setFromthis.euler(this.euler);
+		euler.setFromQuaternion(this.camera.quaternion);
+
+		euler.y -= movementX * 0.002;
+		euler.x -= movementY * 0.002;
+		euler.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, euler.x));
+
+		this.camera.quaternion.setFromEuler(euler);
 	}
 
 	// handle movement
@@ -143,13 +146,13 @@ class PlayerControls {
 	}
 
 	lock() {
-		domElement.requestPointerLock = domElement.requestPointerLock || domElement.mozRequestPointerLock || domElement.webkitRequestPointerLock;
-		domElement.requestPointerLock();
+		this.domElement.requestPointerLock = this.domElement.requestPointerLock || this.domElement.mozRequestPointerLock || this.domElement.webkitRequestPointerLock;
+		this.domElement.requestPointerLock();
 	}
 
 	unlock() {
-		domElement.exitPointerLock = domElement.exitPointerLock || domElement.mozExitPointerLock || domElement.webkitExitPointerLock;
-		domElement.requestPointerLock();
+		this.domElement.exitPointerLock = this.domElement.exitPointerLock || this.domElement.mozExitPointerLock || this.domElement.webkitExitPointerLock;
+		this.domElement.exitPointerLock();
 	}
 
 	onPointerlockChange() {
@@ -162,26 +165,27 @@ class PlayerControls {
 
 	addControlsEventListeners() {
 
-		this.domElement.addEventListener("click", this.lock);
-		this.domElement.addEventListener("mousemove", this.onMouseMove);
-		this.domElement.addEventListener("pointerlockchange", this.onPointerlockChange);
-		this.domElement.addEventListener("pointerlockerror", this.onPointerlockError);
+		this.domElement.addEventListener("click", this.lock.bind(this));
+		this.domElement.addEventListener("mousemove", this.onMouseMove.bind(this));
+		this.domElement.addEventListener("pointerlockchange", this.onPointerlockChange.bind(this));
+		this.domElement.addEventListener("pointerlockerror", this.onPointerlockError.bind(this));
 
-		window.addEventListener("keydown", this.onKeyDown);
-		window.addEventListener("keyup", this.onKeyUp);
+		window.addEventListener("keydown", this.onKeyDown.bind(this));
+		window.addEventListener("keyup", this.onKeyUp.bind(this));
 	}
 
 	removeControlEventListeners() {
-		this.domElement.removeEventListener("click", this.lock);
-		this.domElement.removeEventListener("mousemove", this.onMouseMove);
-		this.domElement.removeEventListener("pointerlockchange", this.onPointerlockChange);
-		this.domElement.removeEventListener("pointerlockerror", this.onPointerlockError);
+		this.domElement.removeEventListener("click", this.lock.bind(this));
+		this.domElement.removeEventListener("mousemove", this.onMouseMove.bind(this));
+		this.domElement.removeEventListener("pointerlockchange", this.onPointerlockChange.bind(this));
+		this.domElement.removeEventListener("pointerlockerror", this.onPointerlockError.bind(this));
 
-		window.removeEventListener("keydown", this.onKeyDown);
-		window.removeEventListener("keyup", this.onKeyUp);
+		window.removeEventListener("keydown", this.onKeyDown.bind(this));
+		window.removeEventListener("keyup", this.onKeyUp.bind(this));
 	}
 	enable() {
 		if (!this.enabled) {
+			log('Enabling player controls')
 			this.enable = true;
 			this.addControlsEventListeners();
 		}
@@ -190,6 +194,7 @@ class PlayerControls {
 	disable() {
 		if (this.enabled) {
 			// Unlocks pointer to this control file
+			log('Disabling player controls')
 			this.unlock();
 			this.removeControlEventListeners();
 			this.enabled = false;

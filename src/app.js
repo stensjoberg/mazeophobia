@@ -6,26 +6,23 @@
  * handles window resizes.
  *
  */
-import { WebGLRenderer, PerspectiveCamera, Vector3, Clock, Box3 } from 'three';
+import { WebGLRenderer, PerspectiveCamera, Vector3, Clock, Box3, Scene } from 'three';
 //import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { PlayerControls } from './PlayerControls.js'
-import { GameScene } from 'scenes';
-
-// Debug boolean for setting debug settings across app
-const DEBUG = false;
+import { GameScene, BeginScene } from 'scenes';
+import { debug } from './constants.js';
 
 // Initialize core ThreeJS components
 const camera = new PerspectiveCamera();
-const scene = new GameScene(camera);
+const gameScene = new GameScene(camera);
 const controls = new PlayerControls(camera, document.body);
 const renderer = new WebGLRenderer({ antialias: true });
 const clock = new Clock();
 
+// let beginScene = new BeginScene();
+
 // Set up camera
 camera.position.set(0, 3, 0);
-if (DEBUG) {
-    camera.position.set(6, 50, -10);
-}
 camera.lookAt(new Vector3(1, 3, 1));
 
 // bounding box for camera
@@ -52,7 +49,7 @@ controls.update();*/
 function handleMovement() {
     const EPS = 0.0001;
 
-    let collision = scene.findCollisions(camera);
+    let collision = gameScene.findCollisions(camera);
     if (collision === undefined) {
         controls.update(clock.getDelta());
     }
@@ -88,11 +85,30 @@ function handleMovement() {
     }
 }
 
-// Render loop
-const onAnimationFrameHandler = (timeStamp) => {
-    handleMovement();
+// Actually renders scene and runs updates
+function renderScene(scene, timeStamp) {
     renderer.render(scene, camera);
     scene.update && scene.update(timeStamp);
+}
+
+const SceneStatus = {
+    Game: 0,
+    Begin: 1,
+    End: 2
+}
+
+controls.enable();
+let currScene = SceneStatus.Game;
+// Render loop
+const onAnimationFrameHandler = (timeStamp) => {
+    if (currScene == SceneStatus.Game) {
+        handleMovement();
+        renderScene(gameScene, timeStamp);
+    }
+
+    if (currScene == SceneStatus.Begin) {
+        renderScene(beginScene, timeStamp);
+    }
     window.requestAnimationFrame(onAnimationFrameHandler);
 };
 window.requestAnimationFrame(onAnimationFrameHandler);
