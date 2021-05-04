@@ -1,5 +1,5 @@
 import { FontLoader, TextGeometry, MeshLambertMaterial, Mesh, MeshBasicMaterial } from 'three';
-
+import { debug } from 'constants'
 export function getFont() {
     const floader = new FontLoader();
     return floader.loadAsync("src/components/fonts/Inconsolata_Condensed_SemiBold_Regular.json");
@@ -29,4 +29,10 @@ export function addText(font, text, x, y, z, x_orientation) {
                 mesh.rotation.y = 0;
             }
             return mesh;
+}
+
+export function log(text) {
+    if (debug.logging) {
+        console.log(text);
+    }
 }

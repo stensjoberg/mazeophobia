@@ -4,7 +4,7 @@ import { debug } from '../../constants';
 import { Floor, Wall, } from 'objects';
 import { BasicLights } from 'lights';
 import Maze from './Maze';
-import { addText, getFont } from './helper';
+import { addText, getFont } from '../../helper';
 
 class GameScene extends Scene {
 
