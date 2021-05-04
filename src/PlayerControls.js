@@ -4,24 +4,27 @@ import { Euler, Vector3 } from 'three';
 
 class PlayerControls {
 	constructor(camera, domElement) {
+		this.camera = camera;
 		this.domElement = domElement;
+
+		this.enabled = false;
 
 		this.movementSpeed = 25.0;
 		this.velocityFactor = 10.0;
 		this.isLocked = false;
 
-		let isMovingForward = false;
-		let isMovingBackward = false;
-		let isMovingLeft = false;
-		let isMovingRight = false;
+		this.isMovingForward = false;
+		this.isMovingBackward = false;
+		this.isMovingLeft = false;
+		this.isMovingRight = false;
 		// DEBUG
-		let isMovingUp = false;
-		let isMovingDown = false;
+		this.isMovingUp = false;
+		this.isMovingDown = false;
 
-		const euler = new Euler(0,0,0,'YXZ');
-		const vector = new Vector3();
-		const velocity = new Vector3();
-		const direction = new Vector3();
+		this.euler = new Euler(0,0,0,'YXZ');
+		this.vector = new Vector3();
+		this.velocity = new Vector3();
+		this.direction = new Vector3();
 
 		
 
@@ -29,28 +32,28 @@ class PlayerControls {
 
 		// update the player position
 		this.update = function(delta) {
-			velocity.x -= velocity.x * this.velocityFactor * delta;
-			velocity.z -= velocity.z * this.velocityFactor * delta;
-			velocity.y -= velocity.y * this.velocityFactor * delta;
+			this.velocity.x -= this.velocity.x * this.velocityFactor * delta;
+			this.velocity.z -= this.velocity.z * this.velocityFactor * delta;
+			this.velocity.y -= this.velocity.y * this.velocityFactor * delta;
 
-			direction.x = Number(isMovingRight) - Number(isMovingLeft);
-			direction.z = Number(isMovingForward) - Number(isMovingBackward);
-			direction.y = Number(isMovingUp) - Number(isMovingDown);
+			this.direction.x = Number(this.isMovingRight) - Number(this.isMovingLeft);
+			this.direction.z = Number(this.isMovingForward) - Number(this.isMovingBackward);
+			this.direction.y = Number(this.isMovingUp) - Number(this.isMovingDown);
 			
-			if (isMovingForward || isMovingBackward) {
-				velocity.z -= direction.z * this.movementSpeed * delta;
+			if (this.isMovingForward || this.isMovingBackward) {
+				this.velocity.z -= this.direction.z * this.movementSpeed * delta;
 
 			}
-			if (isMovingLeft || isMovingRight) {
-				velocity.x -= direction.x * this.movementSpeed * delta;
+			if (this.isMovingLeft || this.isMovingRight) {
+				this.velocity.x -= this.direction.x * this.movementSpeed * delta;
 			}
-			if (isMovingUp || isMovingDown) {
-				velocity.y -= direction.y * this.movementSpeed * delta;
+			if (this.isMovingUp || this.isMovingDown) {
+				this.velocity.y -= this.direction.y * this.movementSpeed * delta;
 			}
 
-			this.moveForward(-velocity.z * delta);
-			this.moveRight(-velocity.x * delta);
-			this.moveUp(-velocity.y * delta);
+			this.moveForward(-this.velocity.z * delta);
+			this.moveRight(-this.velocity.x * delta);
+			this.moveUp(-this.velocity.y * delta);
 		}
 
 	}
@@ -63,36 +66,36 @@ class PlayerControls {
 		const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 		const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 		
-		euler.setFromQuaternion(camera.quaternion);
+		this.euler.setFromQuaternion(this.camera.quaternion);
 
-		euler.y -= movementX * 0.002;
-		euler.x -= movementY * 0.002;
-		euler.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, euler.x));
+		this.euler.y -= movementX * 0.002;
+		this.euler.x -= movementY * 0.002;
+		this.euler.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, this.euler.x));
 
-		camera.quaternion.setFromEuler(euler);
+		this.camera.quaternion.setFromthis.euler(this.euler);
 	}
 
 	// handle movement
 	onKeyDown(event) {
 		switch(event.key) {
 			case "w":
-				isMovingForward = true;
+				this.isMovingForward = true;
 				break;
 			case "a":
-				isMovingLeft = true;
+				this.isMovingLeft = true;
 				break;
 			case "s":
-				isMovingBackward = true;
+				this.isMovingBackward = true;
 				break;
 			case "d":
-				isMovingRight = true;
+				this.isMovingRight = true;
 				break;
 			// DEBUG 
 			case "Shift":
-				isMovingDown = true;
+				this.isMovingDown = true;
 				break;
 			case " ":
-				isMovingUp = true;
+				this.isMovingUp = true;
 				break;
 		}
 
@@ -101,46 +104,51 @@ class PlayerControls {
 	onKeyUp(event) {
 		switch(event.key) {
 			case "w":
-				isMovingForward = false;
+				this.isMovingForward = false;
 				break;
 			case "a":
-				isMovingLeft = false;
+				this.isMovingLeft = false;
 				break;
 			case "s":
-				isMovingBackward = false;
+				this.isMovingBackward = false;
 				break;
 			case "d":
-				isMovingRight = false;
+				this.isMovingRight = false;
 				break;
 			// DEBUG 
 			case "Shift":
-				isMovingDown = false;
+				this.isMovingDown = false;
 				break
 			case " ":
-				isMovingUp = false;
+				this.isMovingUp = false;
 				break;
 		}
 	}
 
 	moveRight(distance) {
-		vector.setFromMatrixColumn(camera.matrix, 0);
-		camera.position.addScaledVector(vector, distance);
+		this.vector.setFromMatrixColumn(this.camera.matrix, 0);
+		this.camera.position.addScaledVector(this.vector, distance);
 	}
 
 	moveForward(distance) {
-		vector.setFromMatrixColumn(camera.matrix, 0);
-		vector.crossVectors(camera.up, vector);
-		camera.position.addScaledVector(vector, distance);
+		this.vector.setFromMatrixColumn(this.camera.matrix, 0);
+		this.vector.crossVectors(this.camera.up, this.vector);
+		this.camera.position.addScaledVector(this.vector, distance);
 	}
 
 	// TODO fix
 	moveUp(distance) {
-		vector.setFromMatrixColumn(camera.matrix, 2);
-		camera.position.addScaledVector(vector, distance);
+		this.vector.setFromMatrixColumn(this.camera.matrix, 2);
+		this.camera.position.addScaledVector(this.vector, distance);
 	}
 
 	lock() {
 		domElement.requestPointerLock = domElement.requestPointerLock || domElement.mozRequestPointerLock || domElement.webkitRequestPointerLock;
+		domElement.requestPointerLock();
+	}
+
+	unlock() {
+		domElement.exitPointerLock = domElement.exitPointerLock || domElement.mozExitPointerLock || domElement.webkitExitPointerLock;
 		domElement.requestPointerLock();
 	}
 
@@ -161,8 +169,33 @@ class PlayerControls {
 
 		window.addEventListener("keydown", this.onKeyDown);
 		window.addEventListener("keyup", this.onKeyUp);
-	
 	}
+
+	removeControlEventListeners() {
+		this.domElement.removeEventListener("click", this.lock);
+		this.domElement.removeEventListener("mousemove", this.onMouseMove);
+		this.domElement.removeEventListener("pointerlockchange", this.onPointerlockChange);
+		this.domElement.removeEventListener("pointerlockerror", this.onPointerlockError);
+
+		window.removeEventListener("keydown", this.onKeyDown);
+		window.removeEventListener("keyup", this.onKeyUp);
+	}
+	enable() {
+		if (!this.enabled) {
+			this.enable = true;
+			this.addControlsEventListeners();
+		}
+	}
+
+	disable() {
+		if (this.enabled) {
+			// Unlocks pointer to this control file
+			this.unlock();
+			this.removeControlEventListeners();
+			this.enabled = false;
+		}
+	}
+	
 }
 
 export { PlayerControls };
