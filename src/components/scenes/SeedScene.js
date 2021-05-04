@@ -224,10 +224,10 @@ class SeedScene extends Scene {
     findCollisions(camera) {
         for (let i = 0; i < this.walls.length; i++) {
             if (this.walls[i].bb.containsPoint(camera.position)) {
-                return true;
+                return this.walls[i].bb;
             }
         }
-        //debugger
+        return undefined;
     }
 }
 

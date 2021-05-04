@@ -49,13 +49,48 @@ controls.minDistance = 4;
 controls.maxDistance = 16;
 controls.update();*/
 
-// Render loop
-const onAnimationFrameHandler = (timeStamp) => {
-    // TODO: push camera position outside of bounding box rather than stop
-    if (!scene.findCollisions(camera)) {
+function handleMovement() {
+    const EPS = 0.0001;
 
+    let collision = scene.findCollisions(camera);
+    if (collision === undefined) {
         controls.update(clock.getDelta());
     }
+    // currently just push the camera outside of the bounding box
+    else {
+        let champDist = Infinity;
+        let champAxis = new Vector3();
+        let champPoint = new Vector3();
+
+        if (Math.abs(camera.position.x - collision.max.x) < champDist) {
+        champDist = Math.abs(camera.position.x - collision.max.x);
+        champAxis = new Vector3(1,0,0);
+        champPoint = new Vector3(collision.max.x, camera.position.y, camera.position.z);
+        }
+        if (Math.abs(camera.position.z - collision.max.z) < champDist) {
+        champDist = Math.abs(camera.position.z - collision.max.z);
+        champAxis = new Vector3(0,0,1);
+        champPoint = new Vector3(camera.position.x, camera.position.y, collision.max.z);
+        }
+        if (Math.abs(camera.position.x - collision.min.x) < champDist) {
+        champDist = Math.abs(camera.position.x - collision.min.x);
+        champAxis = new Vector3(-1,0,0);
+        champPoint = new Vector3(collision.min.x, camera.position.y, camera.position.z);
+        }
+        if (Math.abs(camera.position.z - collision.min.z) < champDist) {
+        champDist = Math.abs(camera.position.z - collision.min.z);
+        champAxis = new Vector3(0,0,-1);
+        champPoint = new Vector3(camera.position.x, camera.position.y, collision.min.z);
+        }
+
+        camera.position.copy(champPoint);
+        camera.position.addScaledVector(champAxis, EPS);
+    }
+}
+
+// Render loop
+const onAnimationFrameHandler = (timeStamp) => {
+    handleMovement();
     renderer.render(scene, camera);
     scene.update && scene.update(timeStamp);
     window.requestAnimationFrame(onAnimationFrameHandler);
