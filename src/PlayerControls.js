@@ -23,93 +23,9 @@ class PlayerControls {
 		const velocity = new Vector3();
 		const direction = new Vector3();
 
-		function onMouseMove(event) {
-			const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-			const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-			
-			euler.setFromQuaternion(camera.quaternion);
+		
 
-			euler.y -= movementX * 0.002;
-			euler.x -= movementY * 0.002;
-			euler.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, euler.x));
-
-			camera.quaternion.setFromEuler(euler);
-		}
-
-		// handle movement
-		function onKeyDown(event) {
-			switch(event.key) {
-				case "w":
-					isMovingForward = true;
-					break;
-				case "a":
-					isMovingLeft = true;
-					break;
-				case "s":
-					isMovingBackward = true;
-					break;
-				case "d":
-					isMovingRight = true;
-					break;
-				// DEBUG 
-				case "Shift":
-					isMovingDown = true;
-					break;
-				case " ":
-					isMovingUp = true;
-					break;
-			}
-
-		}
-
-		function onKeyUp(event) {
-			switch(event.key) {
-				case "w":
-					isMovingForward = false;
-					break;
-				case "a":
-					isMovingLeft = false;
-					break;
-				case "s":
-					isMovingBackward = false;
-					break;
-				case "d":
-					isMovingRight = false;
-					break;
-				// DEBUG 
-				case "Shift":
-					isMovingDown = false;
-					break
-				case " ":
-					isMovingUp = false;
-					break;
-			}
-		}
-
-		function moveRight(distance) {
-			vector.setFromMatrixColumn(camera.matrix, 0);
-			camera.position.addScaledVector(vector, distance);
-		}
-
-		function moveForward(distance) {
-			vector.setFromMatrixColumn(camera.matrix, 0);
-			vector.crossVectors(camera.up, vector);
-			camera.position.addScaledVector(vector, distance);
-		}
-
-		// TODO fix
-		function moveUp(distance) {
-			vector.setFromMatrixColumn(camera.matrix, 2);
-			camera.position.addScaledVector(vector, distance);
-		}
-
-		function onPointerlockChange() {
-
-		}
-
-		function onPointerlockError() {
-			console.error("Unable to use pointer lock API");
-		}
+		
 
 		// update the player position
 		this.update = function(delta) {
@@ -132,27 +48,121 @@ class PlayerControls {
 				velocity.y -= direction.y * this.movementSpeed * delta;
 			}
 
-			moveForward(-velocity.z * delta);
-			moveRight(-velocity.x * delta);
-			moveUp(-velocity.y * delta);
+			this.moveForward(-velocity.z * delta);
+			this.moveRight(-velocity.x * delta);
+			this.moveUp(-velocity.y * delta);
 		}
 
-		function lock() {
-			domElement.requestPointerLock = domElement.requestPointerLock || domElement.mozRequestPointerLock || domElement.webkitRequestPointerLock;
-			domElement.requestPointerLock();
-		}
+	}
 
-		function unlock() {
-			domElement.exitPointerLock();
-		}
+	unlock() {
+		domElement.exitPointerLock();
+	}		
+
+	onMouseMove(event) {
+		const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+		const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 		
-		this.domElement.addEventListener("click", lock);
-		this.domElement.addEventListener("mousemove", onMouseMove);
-		this.domElement.addEventListener("pointerlockchange", onPointerlockChange);
-		this.domElement.addEventListener("pointerlockerror", onPointerlockError);
+		euler.setFromQuaternion(camera.quaternion);
 
-		window.addEventListener("keydown", onKeyDown);
-		window.addEventListener("keyup", onKeyUp);
+		euler.y -= movementX * 0.002;
+		euler.x -= movementY * 0.002;
+		euler.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, euler.x));
+
+		camera.quaternion.setFromEuler(euler);
+	}
+
+	// handle movement
+	onKeyDown(event) {
+		switch(event.key) {
+			case "w":
+				isMovingForward = true;
+				break;
+			case "a":
+				isMovingLeft = true;
+				break;
+			case "s":
+				isMovingBackward = true;
+				break;
+			case "d":
+				isMovingRight = true;
+				break;
+			// DEBUG 
+			case "Shift":
+				isMovingDown = true;
+				break;
+			case " ":
+				isMovingUp = true;
+				break;
+		}
+
+	}
+
+	onKeyUp(event) {
+		switch(event.key) {
+			case "w":
+				isMovingForward = false;
+				break;
+			case "a":
+				isMovingLeft = false;
+				break;
+			case "s":
+				isMovingBackward = false;
+				break;
+			case "d":
+				isMovingRight = false;
+				break;
+			// DEBUG 
+			case "Shift":
+				isMovingDown = false;
+				break
+			case " ":
+				isMovingUp = false;
+				break;
+		}
+	}
+
+	moveRight(distance) {
+		vector.setFromMatrixColumn(camera.matrix, 0);
+		camera.position.addScaledVector(vector, distance);
+	}
+
+	moveForward(distance) {
+		vector.setFromMatrixColumn(camera.matrix, 0);
+		vector.crossVectors(camera.up, vector);
+		camera.position.addScaledVector(vector, distance);
+	}
+
+	// TODO fix
+	moveUp(distance) {
+		vector.setFromMatrixColumn(camera.matrix, 2);
+		camera.position.addScaledVector(vector, distance);
+	}
+
+	lock() {
+		domElement.requestPointerLock = domElement.requestPointerLock || domElement.mozRequestPointerLock || domElement.webkitRequestPointerLock;
+		domElement.requestPointerLock();
+	}
+
+	onPointerlockChange() {
+
+	}
+
+	onPointerlockError() {
+		console.error("Unable to use pointer lock API");
+	}
+	addControlsEventListeners() {
+		
+
+
+		this.domElement.addEventListener("click", this.lock);
+		this.domElement.addEventListener("mousemove", this.onMouseMove);
+		this.domElement.addEventListener("pointerlockchange", this.onPointerlockChange);
+		this.domElement.addEventListener("pointerlockerror", this.onPointerlockError);
+
+		window.addEventListener("keydown", this.onKeyDown);
+		window.addEventListener("keyup", this.onKeyUp);
+	
 	}
 }
 
