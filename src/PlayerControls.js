@@ -151,9 +151,8 @@ class PlayerControls {
 	onPointerlockError() {
 		console.error("Unable to use pointer lock API");
 	}
-	addControlsEventListeners() {
-		
 
+	addControlsEventListeners() {
 
 		this.domElement.addEventListener("click", this.lock);
 		this.domElement.addEventListener("mousemove", this.onMouseMove);
