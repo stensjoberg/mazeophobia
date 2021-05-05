@@ -1,4 +1,4 @@
-import { startMenu, SceneTypes } from '../../constants';
+import { startMenu } from '../../constants';
 import { Scene } from 'three'
 
 class BeginScene extends Scene {
@@ -8,7 +8,6 @@ class BeginScene extends Scene {
     constructor(startGameCallback) {
         
         super();
-        this.type = SceneTypes.Begin;
 
         // Make menu
         this.menuElements = [];

@@ -18,28 +18,7 @@ const camera = new PerspectiveCamera();
 const controls = new PlayerControls(camera, document.body);
 const renderer = new WebGLRenderer({ antialias: true });
 const clock = new Clock();
-const SceneStatus = {
-    Game: 0,
-    Begin: 1,
-    End: 2
-}
 
-let currScene = SceneStatus.Begin;
-let beginScene;
-let gameScene;
-
-const startToGameHandler = () => {
-    changeToGame(beginScene);
-    beginScene = undefined;
-}
-
-function changeToGame(initScene) {
-    initScene.dispose();
-    console.log("Game starting...")
-    gameScene = new GameScene(camera);
-    controls.enable();
-    currScene = SceneStatus.Game;
-}
 
 // Set up camera
 camera.position.set(0, 3, 0);
@@ -57,9 +36,6 @@ canvas.style.display = 'block'; // Removes padding below canvas
 document.body.style.margin = 0; // Removes margin around page
 document.body.style.overflow = 'hidden'; // Fix scrolling
 document.body.appendChild(canvas);
-
-//initStartScene();
-beginScene = new BeginScene(startToGameHandler);
 
 // Set up controls
 /*const controls = new OrbitControls(camera, canvas);
@@ -112,17 +88,29 @@ function handleMovement() {
 // Scene Transitions
 // ========================================================================
 
-const startGameScene = () => {
-    console.log('Killing begin scene')
-    log('Killing begin scene')
-    // scene.kill();
-    // scene = new GameScene();
-};
+let currScene = SceneTypes.Begin;
+let beginScene;
+let gameScene;
 
-let scene = new BeginScene(startGameScene);
+const startToGameHandler = () => {
+    changeToGame(beginScene);
+    beginScene = undefined;
+}
+
+function changeToGame(initScene) {
+    initScene.dispose();
+    console.log("Game starting...")
+    gameScene = new GameScene(camera);
+    controls.enable();
+    currScene = SceneTypes.Game;
+}
+
 // ========================================================================
 // Rendering
 // ========================================================================
+
+beginScene = new BeginScene(startToGameHandler);
+
 
 // Actually renders scene and runs updates
 function renderScene(s, timeStamp) {
@@ -132,13 +120,13 @@ function renderScene(s, timeStamp) {
 
 // Ye olde game loop
 const onAnimationFrameHandler = (timeStamp) => {
-    if (scene.type === SceneTypes.Game) {
+    if (currScene === SceneTypes.Game) {
         handleMovement();
-        renderScene(scene, timeStamp);
+        renderScene(gameScene, timeStamp);
     }
 
-    if (scene.type === SceneTypes.Begin) {
-        renderScene(scene, timeStamp);
+    if (currScene === SceneTypes.Begin) {
+        renderScene(beginScene, timeStamp);
     }
     window.requestAnimationFrame(onAnimationFrameHandler);
 };

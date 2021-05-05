@@ -1,6 +1,6 @@
 import * as Dat from 'dat.gui';
 import { Scene, Color, SpotLight, SpotLightHelper, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial} from 'three';
-import { debug, SceneTypes } from '../../constants';
+import { debug } from '../../constants';
 import { Floor, Wall, } from 'objects';
 import { BasicLights } from 'lights';
 import Maze from './Maze';
@@ -13,8 +13,6 @@ class GameScene extends Scene {
     constructor(camera) {
         // Call parent Scene() constructor
         super();
-
-        this.type = SceneTypes.Game;
 
         // Init state
         this.state = {
