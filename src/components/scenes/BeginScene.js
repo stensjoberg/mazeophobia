@@ -10,7 +10,7 @@ class BeginScene extends Scene {
         super();
         this.type = SceneTypes.Begin;
 
-        // Let's make a menu
+        // Make menu
         this.menuElements = [];
         this.menuElements.push(this.makeTextElement(startMenu.titleText));
         this.menuElements.push(this.makeButton(startMenu.startButtonText, startGameCallback));
@@ -33,11 +33,11 @@ class BeginScene extends Scene {
         return textElem;
     }
 
-    kill() {
-        for (let e of this.menuElements) {
-            e.remove();
-        }
-        this.dispose();
+    dispose() {
+        this.menuElements.forEach((menuElement) => menuElement.remove());
+        this.menuElements = null;
+
+        super.dispose();
     }
 }
 
