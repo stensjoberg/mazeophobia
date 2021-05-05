@@ -14,12 +14,31 @@ import { debug } from './constants.js';
 
 // Initialize core ThreeJS components
 const camera = new PerspectiveCamera();
-const gameScene = new GameScene(camera);
 const controls = new PlayerControls(camera, document.body);
 const renderer = new WebGLRenderer({ antialias: true });
 const clock = new Clock();
+const SceneStatus = {
+    Game: 0,
+    Begin: 1,
+    End: 2
+}
 
-// let beginScene = new BeginScene();
+let currScene = SceneStatus.Begin;
+let beginScene;
+let gameScene;
+
+const startToGameHandler = () => {
+    changeToGame(beginScene);
+    beginScene = undefined;
+}
+
+function changeToGame(initScene) {
+    initScene.dispose();
+    console.log("Game starting...")
+    gameScene = new GameScene(camera);
+    controls.enable();
+    currScene = SceneStatus.Game;
+}
 
 // Set up camera
 camera.position.set(0, 3, 0);
@@ -37,6 +56,9 @@ canvas.style.display = 'block'; // Removes padding below canvas
 document.body.style.margin = 0; // Removes margin around page
 document.body.style.overflow = 'hidden'; // Fix scrolling
 document.body.appendChild(canvas);
+
+//initStartScene();
+beginScene = new BeginScene(startToGameHandler);
 
 // Set up controls
 /*const controls = new OrbitControls(camera, canvas);
@@ -91,14 +113,6 @@ function renderScene(scene, timeStamp) {
     scene.update && scene.update(timeStamp);
 }
 
-const SceneStatus = {
-    Game: 0,
-    Begin: 1,
-    End: 2
-}
-
-controls.enable();
-let currScene = SceneStatus.Game;
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
     if (currScene == SceneStatus.Game) {

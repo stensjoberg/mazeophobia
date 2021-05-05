@@ -2,21 +2,14 @@ import { startMenu } from '../../constants';
 import { Scene } from 'three'
 
 class BeginScene extends Scene {
-
-    
-
-    constructor() {
+    constructor(startGameCallback) {
         
         super();
 
         // Make menu
-        this.menuElementes = [];
-        this.menuElementes.push(this.makeTextElement(startMenu.titleText));
-        this.menuElementes.push(this.makeButton(startMenu.startButtonText, this.testFunction));
-    }
-
-    testFunction() {
-        console.log("Game starting...")
+        this.menuElements = [];
+        this.menuElements.push(this.makeTextElement(startMenu.titleText));
+        this.menuElements.push(this.makeButton(startMenu.startButtonText, startGameCallback));
     }
 
     makeButton(text, clickCallback) {
@@ -34,7 +27,12 @@ class BeginScene extends Scene {
         return textElem;
     }
 
+    dispose() {
+        this.menuElements.forEach((menuElement) => menuElement.remove());
+        this.menuElements = null;
 
+        super.dispose();
+    }
 }
 
 export default BeginScene;
