@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css?family=Creepster');
+
+div {
+    padding: 7px 14px;
+    outline: none;
+    border-radius: 12px;
+    border-width: medium;
+    border-color: white;
+    background: transparent;
+    background-repeat: no-repeat;
+    position: absolute;
+    width: 300px;
+	font-family: 'Creepster';
+    font-size: 60px;
+    cursor: pointer;
+    color: white;
+}
+
+button {
+    padding: 7px 14px;
+    outline: none;
+    border-radius: 12px;
+    border-width: medium;
+    border-color: white;
+    background: transparent;
+    background-repeat: no-repeat;
+    position: absolute;
+    width: 200px;
+	font-family: 'Creepster';
+    font-size: 40px;
+    cursor: pointer;
+    color: white;
+}
+
+button:hover {
+    background: rgba(0, 0, 0, 0.1);
+}

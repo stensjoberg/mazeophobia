@@ -1,5 +1,7 @@
 import { startMenu } from '../../constants';
 import { Scene } from 'three'
+import '../../style.css'
+import _ from 'lodash'
 
 class BeginScene extends Scene {
 
@@ -11,24 +13,30 @@ class BeginScene extends Scene {
 
         // Make menu
         this.menuElements = [];
-        this.menuElements.push(this.makeTextElement(startMenu.titleText));
-        this.menuElements.push(this.makeButton(startMenu.startButtonText, startGameCallback));
+        this.menuElements.push(this.makeTextElement(startMenu.title.name, startMenu.title.offset));
+        this.menuElements.push(this.makeButton(startMenu.start.name, startMenu.start.offset, startGameCallback));
     }
 
     
 
-    makeButton(text, clickCallback) {
+    makeButton(text, top, clickCallback) {
         let button = document.createElement('button');
         document.body.appendChild(button);
+
         button.innerHTML = text;
+        button.style.left = (window.innerWidth - button.clientWidth) / 2 + 'px';
+        button.style.top = top;
         button.onclick = clickCallback;
         return button;
     }
 
-    makeTextElement(text) {
-        let textElem = document.createElement('p');
+    makeTextElement(text, top) {
+        let textElem = document.createElement('div');
         document.body.appendChild(textElem);
+
         textElem.innerHTML = text;
+        textElem.style.left = (window.innerWidth - textElem.clientWidth) / 2 + 'px';
+        textElem.style.top = top;
         return textElem;
     }
 

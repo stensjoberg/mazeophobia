@@ -5,8 +5,14 @@ export const debug = {
 }
 
 export const startMenu = {
-    titleText: "Mazeophobia",
-    startButtonText: "Start",
+    title: {
+        name: "Mazeophobia",
+        offset: "30%",
+    },
+    start: {
+        name: "Start",
+        offset: "70%",
+    }
 }
 
 export const SceneTypes = {
