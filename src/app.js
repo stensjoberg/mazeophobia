@@ -45,45 +45,6 @@ controls.minDistance = 4;
 controls.maxDistance = 16;
 controls.update();*/
 
-function handleMovement() {
-    const EPS = 0.00001;
-
-    let collision = gameScene.findCollisions(camera);
-    if (collision === undefined) {
-        controls.update(clock.getDelta());
-    }
-    // currently just push the camera outside of the bounding box
-    else {
-        let champDist = Infinity;
-        let champAxis = new Vector3();
-        let champPoint = new Vector3();
-
-        if (Math.abs(camera.position.x - collision.max.x) < champDist) {
-        champDist = Math.abs(camera.position.x - collision.max.x);
-        champAxis = new Vector3(1,0,0);
-        champPoint = new Vector3(collision.max.x, camera.position.y, camera.position.z);
-        }
-        if (Math.abs(camera.position.z - collision.max.z) < champDist) {
-        champDist = Math.abs(camera.position.z - collision.max.z);
-        champAxis = new Vector3(0,0,1);
-        champPoint = new Vector3(camera.position.x, camera.position.y, collision.max.z);
-        }
-        if (Math.abs(camera.position.x - collision.min.x) < champDist) {
-        champDist = Math.abs(camera.position.x - collision.min.x);
-        champAxis = new Vector3(-1,0,0);
-        champPoint = new Vector3(collision.min.x, camera.position.y, camera.position.z);
-        }
-        if (Math.abs(camera.position.z - collision.min.z) < champDist) {
-        champDist = Math.abs(camera.position.z - collision.min.z);
-        champAxis = new Vector3(0,0,-1);
-        champPoint = new Vector3(camera.position.x, camera.position.y, collision.min.z);
-        }
-
-        camera.position.copy(champPoint);
-        camera.position.addScaledVector(champAxis, EPS);
-    }
-}
-
 // ========================================================================
 // Scene Transitions
 // ========================================================================
@@ -121,7 +82,7 @@ function renderScene(s, timeStamp) {
 // Ye olde game loop
 const onAnimationFrameHandler = (timeStamp) => {
     if (currScene === SceneTypes.Game) {
-        handleMovement();
+        controls.update(gameScene, clock.getDelta());
         renderScene(gameScene, timeStamp);
     }
 

@@ -34,7 +34,7 @@ class PlayerControls {
 	}
 
 	// update the player position
-	update(delta) {
+	update(gameScene, delta) {
 		this.velocity.x -= this.velocity.x * this.velocityFactor * delta;
 		this.velocity.z -= this.velocity.z * this.velocityFactor * delta;
 		this.velocity.y -= this.velocity.y * this.velocityFactor * delta;
@@ -57,6 +57,43 @@ class PlayerControls {
 		this.moveForward(-this.velocity.z * delta);
 		this.moveRight(-this.velocity.x * delta);
 		this.moveUp(-this.velocity.y * delta);
+
+		let collision = gameScene.findCollisions(this.camera);
+		if (collision !== undefined) {
+			this.handleCollision(collision);
+		}
+	}
+
+	handleCollision(collision) {
+		const EPS = 0.00001;
+		
+		let champDist = Infinity;
+		let champAxis = new Vector3();
+		let champPoint = new Vector3();
+
+		if (Math.abs(this.camera.position.x - collision.max.x) < champDist) {
+			champDist = Math.abs(this.camera.position.x - collision.max.x);
+			champAxis = new Vector3(1,0,0);
+			champPoint = new Vector3(collision.max.x, this.camera.position.y, this.camera.position.z);
+		}
+		if (Math.abs(this.camera.position.z - collision.max.z) < champDist) {
+			champDist = Math.abs(this.camera.position.z - collision.max.z);
+			champAxis = new Vector3(0,0,1);
+			champPoint = new Vector3(this.camera.position.x, this.camera.position.y, collision.max.z);
+		}
+		if (Math.abs(this.camera.position.x - collision.min.x) < champDist) {
+			champDist = Math.abs(this.camera.position.x - collision.min.x);
+			champAxis = new Vector3(-1,0,0);
+			champPoint = new Vector3(collision.min.x, this.camera.position.y, this.camera.position.z);
+		}
+		if (Math.abs(this.camera.position.z - collision.min.z) < champDist) {
+			champDist = Math.abs(this.camera.position.z - collision.min.z);
+			champAxis = new Vector3(0,0,-1);
+			champPoint = new Vector3(this.camera.position.x, this.camera.position.y, collision.min.z);
+		}
+
+		this.camera.position.copy(champPoint);
+        this.camera.position.addScaledVector(champAxis, EPS);
 	}
 	
 	unlock() {

@@ -2,8 +2,6 @@
 
 ## Bug Squashing
 
-- No collision with perimiter walls
-- Stuttering collisions
 - stop tracking mouse when escaping lock (low priority)
 
 ## Features
