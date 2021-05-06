@@ -25,8 +25,8 @@ camera.position.set(0, 3, 0);
 camera.lookAt(new Vector3(1, 3, 1));
 
 // bounding box for camera
-const playerBox = new Box3();
-camera.add(playerBox);
+//const playerBox = new Box3();
+//camera.add(playerBox);
 //console.log(camera)
 
 // Set up renderer, canvas, and minor CSS adjustments

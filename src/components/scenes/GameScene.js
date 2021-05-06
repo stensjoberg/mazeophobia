@@ -99,7 +99,7 @@ class GameScene extends Scene {
             }
             this.add(this.walls[i]);
         }
-        
+
         this.addPerimiter(geometry, material);
 
         // TODO change walls and floor meshes and textures 
@@ -215,12 +215,12 @@ class GameScene extends Scene {
         let max;
 
         if (rotate) {
-            min = new Vector3(xPos - 1, 0, zPos - this.cellWidth / 2);
-            max = new Vector3(xPos + 1, 10, zPos + this.cellWidth / 2);
+            min = new Vector3(xPos - 1, 0, zPos - (this.cellWidth / 2 + 0.5));
+            max = new Vector3(xPos + 1, 10, zPos + (this.cellWidth / 2 + 0.5));
         }
         else {
-            min = new Vector3(xPos - (this.cellWidth / 2), 0, zPos - 1);
-            max = new Vector3(xPos + (this.cellWidth / 2), 10, zPos + 1);
+            min = new Vector3(xPos - (this.cellWidth / 2 + 0.5), 0, zPos - 1);
+            max = new Vector3(xPos + (this.cellWidth / 2 + 0.5), 10, zPos + 1);
         }
 
         let boundingBox = new Box3(min, max);
