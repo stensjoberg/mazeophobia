@@ -46,7 +46,7 @@ controls.maxDistance = 16;
 controls.update();*/
 
 function handleMovement() {
-    const EPS = 0.0001;
+    const EPS = 0.00001;
 
     let collision = gameScene.findCollisions(camera);
     if (collision === undefined) {

@@ -210,6 +210,7 @@ class GameScene extends Scene {
     }
 
     calculateBoundingBox(xPos, zPos, rotate) {
+        const EPS = 0.1;
         let min;
         let max;
 
@@ -222,7 +223,10 @@ class GameScene extends Scene {
             max = new Vector3(xPos + (this.cellWidth / 2), 10, zPos + 1);
         }
 
-        return new Box3(min, max);
+        let boundingBox = new Box3(min, max);
+        boundingBox.expandByScalar(EPS);
+
+        return boundingBox;
     }
 
     findCollisions(camera) {
