@@ -77,13 +77,11 @@ class GameScene extends Scene {
 
         // add perimiter walls
         this.walls = [];
-        this.addPerimiter(geometry, material);
 
         // Making a maze
         let maze = new Maze(this.n);
         maze.runKruskals();
         let edges = maze.getEdges();
-
 
         // Let's get the maze edges into the scene
         for (let i = 0; i < edges.length; i++) {
@@ -96,11 +94,13 @@ class GameScene extends Scene {
                 this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
             }
             else {
-                this.walls[i].rotation.y = 0
+                this.walls[i].rotation.y = 0;
                 this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, false);
             }
             this.add(this.walls[i]);
         }
+        
+        this.addPerimiter(geometry, material);
 
         // TODO change walls and floor meshes and textures 
 
