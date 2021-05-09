@@ -21,7 +21,7 @@ const clock = new Clock();
 
 
 // Set up camera
-camera.position.set(0, 3, 0);
+camera.position.set(0, 30, 0);
 camera.lookAt(new Vector3(1, 3, 1));
 
 // bounding box for camera
@@ -52,6 +52,7 @@ controls.update();*/
 let currScene = SceneTypes.Begin;
 let beginScene;
 let gameScene;
+let endScene;
 
 const startToGameHandler = () => {
     changeToGame(beginScene);
@@ -88,6 +89,10 @@ const onAnimationFrameHandler = (timeStamp) => {
 
     if (currScene === SceneTypes.Begin) {
         renderScene(beginScene, timeStamp);
+    }
+
+    if (currScene === SceneTypes.End) {
+        renderScene(endScene, timeStamp);
     }
     window.requestAnimationFrame(onAnimationFrameHandler);
 };

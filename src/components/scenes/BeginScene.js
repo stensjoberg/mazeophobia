@@ -1,7 +1,6 @@
 import { startMenu } from '../../constants';
 import { Scene } from 'three'
 import '../../style.css'
-import _ from 'lodash'
 
 class BeginScene extends Scene {
 

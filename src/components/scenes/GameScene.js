@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, SpotLight, SpotLightHelper, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial} from 'three';
+import { Scene, Color, SpotLight, SpotLightHelper, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial, SphereGeometry, MeshBasicMaterial} from 'three';
 import { debug } from '../../constants';
 import { Floor, Wall, } from 'objects';
 import { BasicLights } from 'lights';
@@ -26,8 +26,8 @@ class GameScene extends Scene {
         // Loading font for debug use later
         const font = getFont();
 
-        // Set background to light blue
-        this.background = new Color(0x7ec0ee);
+        // Set background to spooky color (doesn't matter if there is ceiling)
+        this.background = new Color(0x130011);
 
         
         // =================================================================================
@@ -56,12 +56,20 @@ class GameScene extends Scene {
 
         // Player spawn already set at (0, 3, 0) in app.js
         // Set finish spot at opposite diagonal end of maze
-        // let finishLight = new PointLight(0xffffff, 2, 40, 0.2);
-        // finishLight.position.set(this.cellWidth*(this.n - 1), 3, this.cellWidth*(this.n - 1));
-        // this.add(finishLight);
-        // this.add(new PointLightHelper(finishLight));
+        /*let finishLight = new PointLight(0xfceea7, 2, 40, 0.2);
+        finishLight.position.set(this.cellWidth*(this.n - 1), 3, this.cellWidth*(this.n - 1));
+        //this.add(finishLight);
+        this.add(new PointLightHelper(finishLight));*/
         // TODO add new finish beacon
-
+        let beaconGeometry = new SphereGeometry(1.0, 4, 2);
+        let beaconMaterial = new MeshBasicMaterial({wireframe: true, fog: false, toneMapped: false, color: 0xfceea7});
+        let beacon = new Mesh(beaconGeometry, beaconMaterial);
+        beacon.position.set(this.cellWidth*(this.n - 1), 3, this.cellWidth*(this.n - 1));
+        this.add(beacon)
+        // get bounding box of beacon
+        let minBeacon = beacon.position.clone().sub(new Vector3(1,1,1));
+        let maxBeacon = beacon.position.clone().add(new Vector3(1,1,1));
+        this.beaconBB = new Box3(minBeacon, maxBeacon);
 
         // Let's put a floor ithis.n the middle of the maze
         const material = new MeshPhongMaterial( {color: 0x1c1c1c } );
@@ -72,8 +80,17 @@ class GameScene extends Scene {
         floor.position.x = (this.cellWidth*this.n)/2;
         floor.position.z = (this.cellWidth*this.n)/2;
 
+        /*let ceiling = new Mesh(geometry, material)
+        this.add(ceiling);
+        ceiling.position.x = (this.cellWidth*this.n)/2;
+        ceiling.position.z = (this.cellWidth*this.n)/2;
+        ceiling.position.y = 4*this.cellWidth;*/
+
         // Setup for wall creation
-        geometry = new BoxGeometry( 9/8*this.cellWidth, 4*this.cellWidth, this.cellWidth/8 );
+        const width = 17/16*this.cellWidth;
+        const height = 4*this.cellWidth;
+        const depth = this.cellWidth/16;
+        geometry = new BoxGeometry(width, height, depth);
 
         // add perimiter walls
         this.walls = [];
