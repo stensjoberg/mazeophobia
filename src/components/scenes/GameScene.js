@@ -28,6 +28,7 @@ class GameScene extends Scene {
 
         // Set background to spooky color (doesn't matter if there is ceiling)
         this.background = new Color(0x130011);
+        this.playerSanity = 100;
 
         
         // =================================================================================
@@ -257,6 +258,14 @@ class GameScene extends Scene {
 
     foundBeacon(camera) {
         return this.beaconBB.containsPoint(camera.position);
+    }
+
+    decrementSanity() {
+        this.playerSanity--;
+    }
+
+    insane() {
+        return this.playerSanity == 0;
     }
 }
 

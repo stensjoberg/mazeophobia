@@ -55,6 +55,7 @@ let beginScene;
 let gameScene;
 let endScene;
 let isGameWin = false;
+let secondsElapsed = 0;
 
 const startToGameHandler = () => {
     changeToGame(beginScene);
@@ -89,6 +90,15 @@ const onAnimationFrameHandler = (timeStamp) => {
         if (gameScene.foundBeacon(camera)) {
             currScene = SceneTypes.End;
             isGameWin = true;
+        }
+        let time = Math.floor(clock.getElapsedTime());
+        if (time > secondsElapsed) {
+            secondsElapsed += 1;
+            gameScene.decrementSanity();
+        }
+        if (gameScene.insane()) {
+            currScene = SceneTypes.End;
+            isGameWin = false;
         }
         renderScene(gameScene, timeStamp);
     }
