@@ -21,7 +21,7 @@ const clock = new Clock();
 
 
 // Set up camera
-camera.position.set(0, 30, 0);
+camera.position.set(0, 3, 0);
 camera.lookAt(new Vector3(1, 3, 1));
 
 // bounding box for camera
