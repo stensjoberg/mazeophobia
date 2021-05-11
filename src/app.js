@@ -94,7 +94,9 @@ const onAnimationFrameHandler = (timeStamp) => {
         let time = Math.floor(clock.getElapsedTime());
         if (time > secondsElapsed) {
             secondsElapsed += 1;
-            gameScene.decrementSanity();
+            if (secondsElapsed % 3 == 0) {
+                gameScene.decrementSanity();
+            }
         }
         if (gameScene.insane()) {
             currScene = SceneTypes.End;

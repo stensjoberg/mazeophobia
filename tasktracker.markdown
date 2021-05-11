@@ -7,9 +7,7 @@
 ## Features
 
 - Instructions after start screen
-- End Screens for win/lose conditions
 - Ambiance - textures, noise, effects (particle effect/torches) etc.
-
 - Sound to guide player to the goal (dripping = good goal, ominous = bad guy) 
 - Light beacon which helps guide player in right direction 
 - Make night sky background texture (see Blenderman)
