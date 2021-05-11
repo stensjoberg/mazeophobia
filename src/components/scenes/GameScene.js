@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, SpotLight, SpotLightHelper, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial, SphereGeometry, MeshBasicMaterial} from 'three';
+import { Scene, Color, SpotLight, CubeTextureLoader, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial, SphereGeometry, MeshBasicMaterial} from 'three';
 import { debug } from '../../constants';
 import { Floor, Wall, } from 'objects';
 import { BasicLights } from 'lights';
@@ -28,6 +28,7 @@ class GameScene extends Scene {
 
         // Set background to spooky color (doesn't matter if there is ceiling)
         this.background = new Color(0x130011);
+        this.addSkyBackground();
         this.playerSanity = 100;
 
         
@@ -67,6 +68,7 @@ class GameScene extends Scene {
         let beacon = new Mesh(beaconGeometry, beaconMaterial);
         beacon.position.set(this.cellWidth*(this.n - 1), 3, this.cellWidth*(this.n - 1));
         this.add(beacon)
+
         // get bounding box of beacon
         let minBeacon = beacon.position.clone().sub(new Vector3(1,1,1));
         let maxBeacon = beacon.position.clone().add(new Vector3(1,1,1));
@@ -89,9 +91,9 @@ class GameScene extends Scene {
 
         // Setup for wall creation
         const width = 17/16*this.cellWidth;
-        const height = 4*this.cellWidth;
+        this.height = 3/2*this.cellWidth;
         const depth = this.cellWidth/16;
-        geometry = new BoxGeometry(width, height, depth);
+        geometry = new BoxGeometry(width, this.height, depth);
 
         // add perimiter walls
         this.walls = [];
@@ -106,7 +108,7 @@ class GameScene extends Scene {
             this.walls[i] = new Mesh( geometry, material );
             this.walls[i].position.x = edges[i].x * this.cellWidth;
             this.walls[i].position.z = edges[i].y * this.cellWidth;
-            this.walls[i].position.y = 2*this.cellWidth;
+            this.walls[i].position.y = this.height/2;
             if (edges[i].x_orientation == true) {
                 this.walls[i].rotation.y = Math.PI/2
                 this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
@@ -133,6 +135,20 @@ class GameScene extends Scene {
         }
     }
 
+    // borrowed from https://github.com/CoryG89/MoonDemo via https://github.com/gnuoyohes/blenderman
+    addSkyBackground() {
+        const path = 'src/components/textures/starfield/'; 
+        var envMap = new CubeTextureLoader().load( [
+              path + 'right.png', // right
+              path + 'left.png', // left
+              path + 'top.png', // top
+              path + 'bottom.png', // bottom
+              path + 'back.png', // back
+              path + 'front.png' // front
+          ] );
+      this.background = envMap;
+  }
+
     addPerimiter(geometry, material) {
         // Add perimeter walls around maze square
         // x: 0, z: 0.5 maze
@@ -143,7 +159,7 @@ class GameScene extends Scene {
             // Close side of the maze
             this.walls[i].position.x = -this.cellWidth/2; 
             this.walls[i].position.z = (i - len) * this.cellWidth;
-            this.walls[i].position.y = 2*this.cellWidth;
+            this.walls[i].position.y = this.height/2;
             this.walls[i].rotation.y = Math.PI/2
 
             this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
