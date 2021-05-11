@@ -39,7 +39,7 @@ class GameScene extends Scene {
             this.flashlight = new SpotLight(0xffffff, 8, 400, Math.PI/2, 0.3);
         }
         else {
-            this.flashlight = new SpotLight(0xffffff, 2, 40, Math.PI/8, 0.6);
+            this.flashlight = new SpotLight(0xffffff, 3, 80, Math.PI/8, 0.6);
         }
         
         //this.flashlight.target = this.camera;
