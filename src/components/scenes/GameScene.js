@@ -51,8 +51,8 @@ class GameScene extends Scene {
         // MAZE GENERATION
         // =================================================================================
         // Defines size of maze
-        this.cellWidth = 4;
-        this.n = 10;
+        this.cellWidth = 10;
+        this.n = 6;
 
         // Player spawn already set at (0, 3, 0) in app.js
         // Set finish spot at opposite diagonal end of maze
