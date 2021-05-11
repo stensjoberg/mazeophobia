@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, SpotLight, CubeTextureLoader, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial, SphereGeometry, MeshBasicMaterial} from 'three';
+import { Scene, Color, SpotLight, CubeTextureLoader, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial, SphereGeometry, MeshBasicMaterial, TextureLoader} from 'three';
 import { debug } from '../../constants';
 import { Floor, Wall, } from 'objects';
 import { BasicLights } from 'lights';
@@ -27,7 +27,6 @@ class GameScene extends Scene {
         const font = getFont();
 
         // Set background to spooky color (doesn't matter if there is ceiling)
-        this.background = new Color(0x130011);
         this.addSkyBackground();
         this.playerSanity = 100;
 
@@ -75,10 +74,10 @@ class GameScene extends Scene {
         this.beaconBB = new Box3(minBeacon, maxBeacon);
 
         // Let's put a floor ithis.n the middle of the maze
-        const material = new MeshPhongMaterial( {color: 0x1c1c1c } );
+        const floorMaterial = new MeshPhongMaterial( {color: 0x1c1c1c } );
         let geometry = new BoxGeometry( this.cellWidth*(this.n + 2), this.cellWidth/8, this.cellWidth*(this.n + 2));
 
-        let floor = new Mesh(geometry, material)
+        let floor = new Mesh(geometry, floorMaterial)
         this.add(floor);
         floor.position.x = (this.cellWidth*this.n)/2;
         floor.position.z = (this.cellWidth*this.n)/2;
@@ -90,6 +89,9 @@ class GameScene extends Scene {
         ceiling.position.y = 4*this.cellWidth;*/
 
         // Setup for wall creation
+        const wallMaterial = new MeshPhongMaterial( {color: 0x1c1c1c,
+                                                     map: new TextureLoader().load('src/components/textures/walls/bricktexture.jpg') } );
+
         const width = 17/16*this.cellWidth;
         this.height = 3/2*this.cellWidth;
         const depth = this.cellWidth/16;
@@ -103,9 +105,10 @@ class GameScene extends Scene {
         maze.runKruskals();
         let edges = maze.getEdges();
 
+
         // Let's get the maze edges into the scene
         for (let i = 0; i < edges.length; i++) {
-            this.walls[i] = new Mesh( geometry, material );
+            this.walls[i] = new Mesh( geometry, wallMaterial);
             this.walls[i].position.x = edges[i].x * this.cellWidth;
             this.walls[i].position.z = edges[i].y * this.cellWidth;
             this.walls[i].position.y = this.height/2;
@@ -120,7 +123,7 @@ class GameScene extends Scene {
             this.add(this.walls[i]);
         }
 
-        this.addPerimiter(geometry, material);
+        this.addPerimiter(geometry, wallMaterial);
 
         // TODO change walls and floor meshes and textures 
 
@@ -174,7 +177,7 @@ class GameScene extends Scene {
             // Far side of the maze
             this.walls[i].position.x = (this.n*this.cellWidth) - this.cellWidth/2; 
             this.walls[i].position.z = (i - len)*this.cellWidth;
-            this.walls[i].position.y = 2*this.cellWidth;
+            this.walls[i].position.y = this.height/2;
             this.walls[i].rotation.y = Math.PI/2
 
             this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
@@ -189,7 +192,7 @@ class GameScene extends Scene {
             // Far side of the maze
             this.walls[i].position.x = (i - len) * this.cellWidth;
             this.walls[i].position.z = -this.cellWidth/2;
-            this.walls[i].position.y = 2*this.cellWidth;
+            this.walls[i].position.y = this.height/2;
             this.walls[i].rotation.y = 0;
 
             this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, false);
@@ -204,7 +207,7 @@ class GameScene extends Scene {
             // Far side of the maze
             this.walls[i].position.x = (i - len)*this.cellWidth;
             this.walls[i].position.z = (this.n*this.cellWidth) - this.cellWidth/2;
-            this.walls[i].position.y = 2*this.cellWidth;
+            this.walls[i].position.y = this.height/2;
 
             this.walls[i].rotation.y = 0;
 
