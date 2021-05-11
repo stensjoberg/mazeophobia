@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, SpotLight, CubeTextureLoader, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial, SphereGeometry, MeshBasicMaterial, TextureLoader} from 'three';
+import { Scene, Color, SpotLight, CubeTextureLoader, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial, SphereGeometry, MeshStandardMaterial, MeshBasicMaterial, TextureLoader} from 'three';
 import { debug } from '../../constants';
 import { Floor, Wall, } from 'objects';
 import { BasicLights } from 'lights';
@@ -74,7 +74,10 @@ class GameScene extends Scene {
         this.beaconBB = new Box3(minBeacon, maxBeacon);
 
         // Let's put a floor ithis.n the middle of the maze
-        const floorMaterial = new MeshPhongMaterial( {color: 0x1c1c1c } );
+        const textureLoader = new TextureLoader();
+        const floorMaterial = new MeshStandardMaterial( {color: 0x1c1c1c,
+                                                      map: textureLoader.load('src/components/textures/floor/soiltexture.jpg') } );
+
         let geometry = new BoxGeometry( this.cellWidth*(this.n + 2), this.cellWidth/8, this.cellWidth*(this.n + 2));
 
         let floor = new Mesh(geometry, floorMaterial)
@@ -89,8 +92,8 @@ class GameScene extends Scene {
         ceiling.position.y = 4*this.cellWidth;*/
 
         // Setup for wall creation
-        const wallMaterial = new MeshPhongMaterial( {color: 0x1c1c1c,
-                                                     map: new TextureLoader().load('src/components/textures/walls/bricktexture.jpg') } );
+        const wallMaterial = new MeshStandardMaterial( {color: 0x1c1c1c,
+                                                     map: textureLoader.load('src/components/textures/walls/bricktexture.jpg') } );
 
         const width = 17/16*this.cellWidth;
         this.height = 3/2*this.cellWidth;
