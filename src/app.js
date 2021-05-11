@@ -12,6 +12,7 @@ import { PlayerControls } from './PlayerControls.js'
 import { GameScene, BeginScene } from 'scenes';
 import { debug, SceneTypes } from './constants';
 import { log } from './helper'
+import EndScene from './components/scenes/EndScene.js';
 
 // Initialize core ThreeJS components
 const camera = new PerspectiveCamera();
@@ -21,7 +22,7 @@ const clock = new Clock();
 
 
 // Set up camera
-camera.position.set(0, 3, 0);
+camera.position.set(40, 3, 40);
 camera.lookAt(new Vector3(1, 3, 1));
 
 // bounding box for camera
@@ -53,6 +54,7 @@ let currScene = SceneTypes.Begin;
 let beginScene;
 let gameScene;
 let endScene;
+let isGameWin = false;
 
 const startToGameHandler = () => {
     changeToGame(beginScene);
@@ -84,6 +86,10 @@ function renderScene(s, timeStamp) {
 const onAnimationFrameHandler = (timeStamp) => {
     if (currScene === SceneTypes.Game) {
         controls.update(gameScene, clock.getDelta());
+        if (gameScene.foundBeacon(camera)) {
+            currScene = SceneTypes.End;
+            isGameWin = true;
+        }
         renderScene(gameScene, timeStamp);
     }
 
@@ -92,6 +98,8 @@ const onAnimationFrameHandler = (timeStamp) => {
     }
 
     if (currScene === SceneTypes.End) {
+        controls.unlock();
+        endScene = new EndScene(isGameWin, startToGameHandler);
         renderScene(endScene, timeStamp);
     }
     window.requestAnimationFrame(onAnimationFrameHandler);

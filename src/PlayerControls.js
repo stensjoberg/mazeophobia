@@ -9,7 +9,7 @@ class PlayerControls {
 
 		this.enabled = false;
 
-		this.movementSpeed = 25.0;
+		this.movementSpeed = 50.0;
 		this.velocityFactor = 10.0;
 		this.isLocked = false;
 
@@ -24,13 +24,6 @@ class PlayerControls {
 		this.vector = new Vector3();
 		this.velocity = new Vector3();
 		this.direction = new Vector3();
-
-		
-
-		
-
-		
-
 	}
 
 	// update the player position
@@ -96,9 +89,9 @@ class PlayerControls {
         this.camera.position.addScaledVector(champAxis, EPS);
 	}
 	
-	unlock() {
-		domElement.exitPointerLock();
-	}		
+	/*unlock() {
+		this.domElement.exitPointerLock();
+	}	*/	
 
 	onMouseMove(event) {
 		const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
@@ -188,8 +181,8 @@ class PlayerControls {
 	}
 
 	unlock() {
-		this.domElement.exitPointerLock = this.domElement.exitPointerLock || this.domElement.mozExitPointerLock || this.domElement.webkitExitPointerLock;
-		this.domElement.exitPointerLock();
+		document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
+		document.exitPointerLock();
 	}
 
 	onPointerlockChange() {

@@ -254,6 +254,10 @@ class GameScene extends Scene {
         }
         return undefined;
     }
+
+    foundBeacon(camera) {
+        return this.beaconBB.containsPoint(camera.position);
+    }
 }
 
 export default GameScene;
