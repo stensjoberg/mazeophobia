@@ -36,13 +36,18 @@ class GameScene extends Scene {
         // =================================================================================
         // Pretty weak and narrow per arguments
         if (debug.flashlight) {
-            this.flashlight = new SpotLight(0xffffff, 8, 400, Math.PI/2, 0.3);
+            this.baseLightIntensity = 1;
+            this.baseLightLength = 100;
+            this.baseLightAngle = Math.PI/3;
         }
         else {
-            this.flashlight = new SpotLight(0xffffff, 3, 80, Math.PI/8, 0.6);
+            this.baseLightIntensity = 1;
+            this.baseLightLength = 100;
+            this.baseLightAngle = Math.PI/8;
         }
+
+        this.flashlight = new SpotLight(0xffffff, this.baseLightIntensity, this.baseLightLength, this.baseLightAngle, 0.6);
         
-        //this.flashlight.target = this.camera;
         this.add(this.flashlight);
         // Since we'll be updating the target position, it needs to be part of the scene
         this.add(this.flashlight.target);
@@ -75,7 +80,7 @@ class GameScene extends Scene {
 
         // Let's put a floor ithis.n the middle of the maze
         const textureLoader = new TextureLoader();
-        const floorMaterial = new MeshStandardMaterial( {color: 0x1c1c1c,
+        const floorMaterial = new MeshStandardMaterial( {
                                                       map: textureLoader.load('src/components/textures/floor/soiltexture.jpg') } );
 
         let geometry = new BoxGeometry( this.cellWidth*(this.n + 2), this.cellWidth/8, this.cellWidth*(this.n + 2));
@@ -92,13 +97,22 @@ class GameScene extends Scene {
         ceiling.position.y = 4*this.cellWidth;*/
 
         // Setup for wall creation
-        const wallMaterial = new MeshStandardMaterial( {color: 0x1c1c1c,
-                                                     map: textureLoader.load('src/components/textures/walls/bricktexture.jpg') } );
+        const wallMaterials = [
+            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture_short.jpg')}),
+            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture_short.jpg')}),
+            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture_short.jpg')}),
+            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture_short.jpg')}),
+            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture.jpg')}),
+            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture.jpg')}),
+        ];
 
-        const width = 17/16*this.cellWidth;
+        // Defines short and long widths
+        const swidth = 15/16*this.cellWidth;
+        const wwidth = 17/16*this.cellWidth;
         this.height = 3/2*this.cellWidth;
         const depth = this.cellWidth/16;
-        geometry = new BoxGeometry(width, this.height, depth);
+
+        // Initializes geometry without width, which is set later, dpeneding on orientation
 
         // add perimiter walls
         this.walls = [];
@@ -108,25 +122,30 @@ class GameScene extends Scene {
         maze.runKruskals();
         let edges = maze.getEdges();
 
+        geometry = new BoxGeometry(this.cellWidth, this.height, depth);
 
         // Let's get the maze edges into the scene
         for (let i = 0; i < edges.length; i++) {
-            this.walls[i] = new Mesh( geometry, wallMaterial);
+            let rot;
+
+            if (edges[i].x_orientation == true) {
+                rot = Math.PI/2; 
+            }
+            else {
+                rot = 0;
+            }
+
+            this.walls[i] = new Mesh( geometry, wallMaterials);
             this.walls[i].position.x = edges[i].x * this.cellWidth;
             this.walls[i].position.z = edges[i].y * this.cellWidth;
             this.walls[i].position.y = this.height/2;
-            if (edges[i].x_orientation == true) {
-                this.walls[i].rotation.y = Math.PI/2
-                this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
-            }
-            else {
-                this.walls[i].rotation.y = 0;
-                this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, false);
-            }
+            this.walls[i].rotation.y = rot;
+            this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, edges[i].x_orientation);
+            
             this.add(this.walls[i]);
         }
 
-        this.addPerimiter(geometry, wallMaterial);
+        this.addPerimiter(geometry, wallMaterials);
 
         // TODO change walls and floor meshes and textures 
 
@@ -238,7 +257,10 @@ class GameScene extends Scene {
         // We readjust position to right in front of camera, this is our target
         lightPos.addScaledVector(dir, 3);
         this.flashlight.target.position.copy(lightPos);
-        //console.log(this.camera.position)
+
+        // We also update the light angle and intensity based on insanity level
+        this.flashlight.angle = this.baseLightAngle * this.playerSanity / 100;
+        this.flashlight.intensity = this.baseLightIntensity * this.playerSanity / 100;
     }
     update(timeStamp) {
         const { updateList } = this.state;
