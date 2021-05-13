@@ -1,8 +1,7 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, SpotLight, CubeTextureLoader, PointLight, SpotLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial, SphereGeometry, MeshStandardMaterial, MeshBasicMaterial, TextureLoader} from 'three';
+import { Scene, SpotLight, CubeTextureLoader, Vector3, BoxGeometry, Mesh, Box3, SphereGeometry, MeshStandardMaterial, MeshBasicMaterial, TextureLoader, AudioListener} from 'three';
 import { debug } from '../../constants';
 import { Floor, Wall, } from 'objects';
-import { BasicLights } from 'lights';
 import Maze from './Maze';
 import { addText, getFont } from '../../helper';
 
@@ -30,7 +29,12 @@ class GameScene extends Scene {
         this.addSkyBackground();
         this.playerSanity = 100;
 
-        
+
+        // =================================================================================
+        // AUDIO SETUP
+        // =================================================================================
+
+        const listnr = new AudioListener();
         // =================================================================================
         // PLAYER FLASHLIGHT
         // =================================================================================
@@ -102,13 +106,9 @@ class GameScene extends Scene {
             new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture.jpg')}),
         ];
 
-        // Defines short and long widths
-        const swidth = 15/16*this.cellWidth;
-        const wwidth = 17/16*this.cellWidth;
+        // Defines some wall size variables
         this.height = 3/2*this.cellWidth;
         const depth = this.cellWidth/16;
-
-        // Initializes geometry without width, which is set later, dpeneding on orientation
 
         // add perimiter walls
         this.walls = [];
