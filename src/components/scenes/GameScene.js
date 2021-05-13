@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, SpotLight, CubeTextureLoader, Vector3, BoxGeometry, Mesh, Box3, SphereGeometry, MeshStandardMaterial, MeshBasicMaterial, TextureLoader, AudioListener, Audio, AudioLoader} from 'three';
+import { Scene, SpotLight, CubeTextureLoader, Vector3, BoxGeometry, Mesh, Box3, SphereGeometry, MeshStandardMaterial, MeshBasicMaterial, TextureLoader, AudioListener, Audio, AudioLoader, CylinderGeometry} from 'three';
 import { debug } from '../../constants';
 import { Floor, Wall, } from 'objects';
 import Maze from './Maze';
@@ -101,18 +101,13 @@ class GameScene extends Scene {
 
         // Player spawn already set at (0, 3, 0) in app.js
         // Set finish spot at opposite diagonal end of maze
-        let beaconGeometry = new SphereGeometry(1.0, 4, 2);
-        let beaconMaterial = new MeshBasicMaterial({wireframe: true, fog: false, toneMapped: false, color: 0xfceea7});
+        let beaconGeometry = new CylinderGeometry(1, 1, 200, 32)
+        let beaconMaterial = new MeshBasicMaterial({wireframe: false, fog: false, toneMapped: false, color: 0xfceea7});
 
         let beaconObj = new Mesh(beaconGeometry, beaconMaterial);
         beaconObj.position.set(this.cellWidth*(this.n - 1), 6, this.cellWidth*(this.n - 1));
-
-        let skyBeaconGeometry = new SphereGeometry(2.0, 4, 2);
-        let beaconSky = new Mesh(skyBeaconGeometry, beaconMaterial);
-        beaconSky.position.set(this.cellWidth*(this.n - 1), 100, this.cellWidth*(this.n - 1));
         
         this.add(beaconObj);
-        this.add(beaconSky);
 
         // get bounding box of beacon
         let minBeacon = beaconObj.position.clone().sub(new Vector3(1,1,1));
