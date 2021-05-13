@@ -88,6 +88,7 @@ const onAnimationFrameHandler = (timeStamp) => {
     if (currScene === SceneTypes.Game) {
         controls.update(gameScene, clock.getDelta());
         if (gameScene.foundBeacon(camera)) {
+            gameScene.stopSound();
             currScene = SceneTypes.End;
             isGameWin = true;
         }
@@ -99,6 +100,7 @@ const onAnimationFrameHandler = (timeStamp) => {
             }
         }
         if (gameScene.insane()) {
+            gameScene.stopSound();
             currScene = SceneTypes.End;
             isGameWin = false;
         }

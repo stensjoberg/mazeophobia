@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, SpotLight, CubeTextureLoader, Vector3, BoxGeometry, Mesh, Box3, SphereGeometry, MeshStandardMaterial, MeshBasicMaterial, TextureLoader, AudioListener} from 'three';
+import { Scene, SpotLight, CubeTextureLoader, Vector3, BoxGeometry, Mesh, Box3, SphereGeometry, MeshStandardMaterial, MeshBasicMaterial, TextureLoader, AudioListener, Audio, AudioLoader} from 'three';
 import { debug } from '../../constants';
 import { Floor, Wall, } from 'objects';
 import Maze from './Maze';
@@ -34,7 +34,30 @@ class GameScene extends Scene {
         // AUDIO SETUP
         // =================================================================================
 
+        // Add listerner to camera
         const listnr = new AudioListener();
+        this.camera.add(listnr);
+
+        // Global audio source
+        this.sound = new Audio(listnr);
+        this.sound.setLoop(false);
+        this.sound.setVolume(0.5);
+        this.sound.hasPlaybackControl = true;
+
+        // Audio loader 
+        this.audioLdr = new AudioLoader();
+        // Audio loader callback bound to this instance
+        this.boundRunAudio = this.runAudio.bind(this);
+
+        this.backgroundSound = new Audio(listnr);
+        this.loadAudio('night_ambient.wav', function(buffer) {
+            this.backgroundSound.setBuffer(buffer);
+            this.backgroundSound.setLoop(true);
+            this.backgroundSound.setVolume(0.3);
+            this.backgroundSound.hasPlaybackControl = true;
+            this.backgroundSound.play();
+        }.bind(this));
+         
         // =================================================================================
         // PLAYER FLASHLIGHT
         // =================================================================================
@@ -168,7 +191,45 @@ class GameScene extends Scene {
               path + 'front.png' // front
           ] );
       this.background = envMap;
-  }
+    }
+
+    runAudio(buffer) {
+        this.sound.setBuffer(buffer);
+        this.sound.play();
+
+    }
+
+    loadAudio(filename, callback) {
+        this.audioLdr.load( 'src/components/audio/' + filename, callback)
+    }
+
+    randomlyRunAudio() {
+        const sounds = [
+            'creepy_footstep',
+            'creepy_glass',
+            'creepy_laugh',
+            //'creepy_lullaby',
+            // 'night_ambient',
+            'player_heartbeat',
+        ]
+
+        const treshold = 0.2;
+        // Only play new sound if something isn't already playing (prevent overlap and hard cutoff)
+        if (!this.sound.isPlaying) {
+            // Generate odds increasing with player sanity
+            let randOdds = Math.random() * this.playerSanity;
+            if (randOdds <= treshold) {
+                // If won lottery, pick random noise to play
+                let randIdx = Math.round(Math.random() * (sounds.length - 1))
+                this.loadAudio(sounds[randIdx] + '.wav', this.boundRunAudio)
+            }
+        }
+    }
+
+    stopSound() {
+        this.sound.stop()
+        this.backgroundSound.stop();
+    }
 
     addPerimiter(geometry, material) {
         // Add perimeter walls around maze square
@@ -261,6 +322,7 @@ class GameScene extends Scene {
     update(timeStamp) {
         const { updateList } = this.state;
         this.updateFlashlight();
+        this.randomlyRunAudio();
         // Call update for each object in the updateList
         for (const obj of updateList) {
             obj.update(timeStamp);

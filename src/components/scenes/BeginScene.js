@@ -39,6 +39,7 @@ class BeginScene extends Scene {
         return textElem;
     }
 
+
     dispose() {
         this.menuElements.forEach((menuElement) => menuElement.remove());
         this.menuElements = null;
