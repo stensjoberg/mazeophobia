@@ -213,7 +213,7 @@ class GameScene extends Scene {
             'player_heartbeat',
         ]
 
-        const treshold = 0.2;
+        const treshold = 0.1;
         // Only play new sound if something isn't already playing (prevent overlap and hard cutoff)
         if (!this.sound.isPlaying) {
             // Generate odds increasing with player sanity
