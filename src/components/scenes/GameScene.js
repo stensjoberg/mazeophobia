@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, SpotLight, CubeTextureLoader, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial, SphereGeometry, MeshStandardMaterial, MeshBasicMaterial, TextureLoader} from 'three';
+import { Scene, Color, SpotLight, CubeTextureLoader, PointLight, SpotLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial, SphereGeometry, MeshStandardMaterial, MeshBasicMaterial, TextureLoader} from 'three';
 import { debug } from '../../constants';
 import { Floor, Wall, } from 'objects';
 import { BasicLights } from 'lights';
@@ -60,24 +60,6 @@ class GameScene extends Scene {
         this.cellWidth = 10;
         this.n = 6;
 
-        // Player spawn already set at (0, 3, 0) in app.js
-        // Set finish spot at opposite diagonal end of maze
-        /*let finishLight = new PointLight(0xfceea7, 2, 40, 0.2);
-        finishLight.position.set(this.cellWidth*(this.n - 1), 3, this.cellWidth*(this.n - 1));
-        //this.add(finishLight);
-        this.add(new PointLightHelper(finishLight));*/
-        // TODO add new finish beacon
-        let beaconGeometry = new SphereGeometry(1.0, 4, 2);
-        let beaconMaterial = new MeshBasicMaterial({wireframe: true, fog: false, toneMapped: false, color: 0xfceea7});
-        let beacon = new Mesh(beaconGeometry, beaconMaterial);
-        beacon.position.set(this.cellWidth*(this.n - 1), 3, this.cellWidth*(this.n - 1));
-        this.add(beacon)
-
-        // get bounding box of beacon
-        let minBeacon = beacon.position.clone().sub(new Vector3(1,1,1));
-        let maxBeacon = beacon.position.clone().add(new Vector3(1,1,1));
-        this.beaconBB = new Box3(minBeacon, maxBeacon);
-
         // Let's put a floor ithis.n the middle of the maze
         const textureLoader = new TextureLoader();
         const floorMaterial = new MeshStandardMaterial( {
@@ -90,11 +72,25 @@ class GameScene extends Scene {
         floor.position.x = (this.cellWidth*this.n)/2;
         floor.position.z = (this.cellWidth*this.n)/2;
 
-        /*let ceiling = new Mesh(geometry, material)
-        this.add(ceiling);
-        ceiling.position.x = (this.cellWidth*this.n)/2;
-        ceiling.position.z = (this.cellWidth*this.n)/2;
-        ceiling.position.y = 4*this.cellWidth;*/
+        // Player spawn already set at (0, 3, 0) in app.js
+        // Set finish spot at opposite diagonal end of maze
+        let beaconGeometry = new SphereGeometry(1.0, 4, 2);
+        let beaconMaterial = new MeshBasicMaterial({wireframe: true, fog: false, toneMapped: false, color: 0xfceea7});
+
+        let beaconObj = new Mesh(beaconGeometry, beaconMaterial);
+        beaconObj.position.set(this.cellWidth*(this.n - 1), 6, this.cellWidth*(this.n - 1));
+
+        let skyBeaconGeometry = new SphereGeometry(2.0, 4, 2);
+        let beaconSky = new Mesh(skyBeaconGeometry, beaconMaterial);
+        beaconSky.position.set(this.cellWidth*(this.n - 1), 100, this.cellWidth*(this.n - 1));
+        
+        this.add(beaconObj);
+        this.add(beaconSky);
+
+        // get bounding box of beacon
+        let minBeacon = beaconObj.position.clone().sub(new Vector3(1,1,1));
+        let maxBeacon = beaconObj.position.clone().add(new Vector3(1,1,1));
+        this.beaconBB = new Box3(minBeacon, maxBeacon);
 
         // Setup for wall creation
         const wallMaterials = [
