@@ -22,7 +22,7 @@ const clock = new Clock();
 
 
 // Set up camera
-camera.position.set(40, 6, 40);
+camera.position.set(0, 6, 0);
 camera.lookAt(new Vector3(1, 5, 1));
 
 // bounding box for camera

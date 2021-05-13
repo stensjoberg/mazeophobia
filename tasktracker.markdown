@@ -8,8 +8,7 @@
 
 - Instructions after start screen
 - Ambiance - textures, noise, effects (particle effect/torches) etc.
-- Sound to guide player to the goal (dripping = good goal, ominous = bad guy) 
-- Light beacon which helps guide player in right direction 
+- Sound to guide player to the goal (dripping = good goal, ominous = bad guy)
 - Fix dimensions of walls to make everything flush
 - Make texture for short end of brick walls (enables ^)
 
