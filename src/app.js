@@ -16,7 +16,7 @@ import EndScene from './components/scenes/EndScene.js';
 
 // Initialize core ThreeJS components
 const camera = new PerspectiveCamera();
-const controls = new PlayerControls(camera, document.body);
+let controls; 
 const renderer = new WebGLRenderer({ antialias: true });
 const clock = new Clock();
 
@@ -65,6 +65,7 @@ const startToGameHandler = () => {
 function changeToGame(initScene) {
     initScene.dispose();
     console.log("Game starting...")
+    controls = new PlayerControls(camera, document.body);
     gameScene = new GameScene(camera);
     controls.enable();
     currScene = SceneTypes.Game;
