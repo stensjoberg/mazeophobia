@@ -1,6 +1,6 @@
 // Adapted from https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/PointerLockControls.js
 
-import { Euler, Vector3 } from 'three';
+import { Audio, AudioListener, AudioLoader, Euler, Vector3 } from 'three';
 import { log } from './helper'
 class PlayerControls {
 	constructor(camera, domElement) {
@@ -9,7 +9,7 @@ class PlayerControls {
 
 		this.enabled = false;
 
-		this.movementSpeed = 25.0;
+		this.movementSpeed = 50.0;
 		this.velocityFactor = 10.0;
 		this.isLocked = false;
 
@@ -25,12 +25,15 @@ class PlayerControls {
 		this.velocity = new Vector3();
 		this.direction = new Vector3();
 
-		
-
-		
-
-		
-
+		const listener = new AudioListener();
+		this.camera.add(listener);
+		this.walkSound = new Audio(listener);
+		this.audioLoader = new AudioLoader();
+		this.audioLoader.load('src/components/audio/player_walk.wav', function( buffer ) {
+			this.walkSound.setBuffer( buffer );
+			this.walkSound.setLoop( true );
+			this.walkSound.setVolume( 0.4 );
+		}.bind(this));
 	}
 
 	// update the player position
@@ -96,9 +99,9 @@ class PlayerControls {
         this.camera.position.addScaledVector(champAxis, EPS);
 	}
 	
-	unlock() {
-		domElement.exitPointerLock();
-	}		
+	/*unlock() {
+		this.domElement.exitPointerLock();
+	}	*/	
 
 	onMouseMove(event) {
 		const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
@@ -120,15 +123,19 @@ class PlayerControls {
 		switch(event.key) {
 			case "w":
 				this.isMovingForward = true;
+				if (!this.walkSound.isPlaying) this.walkSound.play();
 				break;
 			case "a":
 				this.isMovingLeft = true;
+				if (!this.walkSound.isPlaying) this.walkSound.play();
 				break;
 			case "s":
 				this.isMovingBackward = true;
+				if (!this.walkSound.isPlaying) this.walkSound.play();
 				break;
 			case "d":
 				this.isMovingRight = true;
+				if (!this.walkSound.isPlaying) this.walkSound.play();
 				break;
 			// DEBUG 
 			case "Shift":
@@ -145,15 +152,19 @@ class PlayerControls {
 		switch(event.key) {
 			case "w":
 				this.isMovingForward = false;
+				this.walkSound.pause();
 				break;
 			case "a":
 				this.isMovingLeft = false;
+				this.walkSound.pause();
 				break;
 			case "s":
 				this.isMovingBackward = false;
+				this.walkSound.pause();
 				break;
 			case "d":
 				this.isMovingRight = false;
+				this.walkSound.pause();
 				break;
 			// DEBUG 
 			case "Shift":
@@ -188,8 +199,8 @@ class PlayerControls {
 	}
 
 	unlock() {
-		this.domElement.exitPointerLock = this.domElement.exitPointerLock || this.domElement.mozExitPointerLock || this.domElement.webkitExitPointerLock;
-		this.domElement.exitPointerLock();
+		document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
+		document.exitPointerLock();
 	}
 
 	onPointerlockChange() {

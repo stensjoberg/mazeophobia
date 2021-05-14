@@ -1,8 +1,7 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, SpotLight, SpotLightHelper, PointLight, PointLightHelper, Vector3, MeshLambertMaterial, BoxGeometry, Mesh, Object3D, Box3, MeshPhongMaterial, SphereGeometry, MeshBasicMaterial} from 'three';
+import { Scene, SpotLight, CubeTextureLoader, Vector3, BoxGeometry, Mesh, Box3, SphereGeometry, MeshStandardMaterial, MeshBasicMaterial, TextureLoader, AudioListener, Audio, AudioLoader, CylinderGeometry} from 'three';
 import { debug } from '../../constants';
 import { Floor, Wall, } from 'objects';
-import { BasicLights } from 'lights';
 import Maze from './Maze';
 import { addText, getFont } from '../../helper';
 
@@ -27,21 +26,55 @@ class GameScene extends Scene {
         const font = getFont();
 
         // Set background to spooky color (doesn't matter if there is ceiling)
-        this.background = new Color(0x130011);
+        this.addSkyBackground();
+        this.playerSanity = 100;
 
-        
+
+        // =================================================================================
+        // AUDIO SETUP
+        // =================================================================================
+
+        // Add listerner to camera
+        const listnr = new AudioListener();
+        this.camera.add(listnr);
+
+        // Global audio source
+        this.sound = new Audio(listnr);
+        this.sound.setLoop(false);
+        this.sound.setVolume(0.5);
+        this.sound.hasPlaybackControl = true;
+
+        // Audio loader 
+        this.audioLdr = new AudioLoader();
+        // Audio loader callback bound to this instance
+        this.boundRunAudio = this.runAudio.bind(this);
+
+        this.backgroundSound = new Audio(listnr);
+        this.loadAudio('night_ambient.wav', function(buffer) {
+            this.backgroundSound.setBuffer(buffer);
+            this.backgroundSound.setLoop(true);
+            this.backgroundSound.setVolume(0.3);
+            this.backgroundSound.hasPlaybackControl = true;
+            this.backgroundSound.play();
+        }.bind(this));
+         
         // =================================================================================
         // PLAYER FLASHLIGHT
         // =================================================================================
         // Pretty weak and narrow per arguments
         if (debug.flashlight) {
-            this.flashlight = new SpotLight(0xffffff, 8, 400, Math.PI/2, 0.3);
+            this.baseLightIntensity = 1;
+            this.baseLightLength = 100;
+            this.baseLightAngle = Math.PI/3;
         }
         else {
-            this.flashlight = new SpotLight(0xffffff, 2, 40, Math.PI/8, 0.6);
+            this.baseLightIntensity = 1;
+            this.baseLightLength = 100;
+            this.baseLightAngle = Math.PI/8;
         }
+
+        this.flashlight = new SpotLight(0xffffff, this.baseLightIntensity, this.baseLightLength, this.baseLightAngle, 0.6);
         
-        //this.flashlight.target = this.camera;
         this.add(this.flashlight);
         // Since we'll be updating the target position, it needs to be part of the scene
         this.add(this.flashlight.target);
@@ -54,43 +87,46 @@ class GameScene extends Scene {
         this.cellWidth = 10;
         this.n = 6;
 
-        // Player spawn already set at (0, 3, 0) in app.js
-        // Set finish spot at opposite diagonal end of maze
-        /*let finishLight = new PointLight(0xfceea7, 2, 40, 0.2);
-        finishLight.position.set(this.cellWidth*(this.n - 1), 3, this.cellWidth*(this.n - 1));
-        //this.add(finishLight);
-        this.add(new PointLightHelper(finishLight));*/
-        // TODO add new finish beacon
-        let beaconGeometry = new SphereGeometry(1.0, 4, 2);
-        let beaconMaterial = new MeshBasicMaterial({wireframe: true, fog: false, toneMapped: false, color: 0xfceea7});
-        let beacon = new Mesh(beaconGeometry, beaconMaterial);
-        beacon.position.set(this.cellWidth*(this.n - 1), 3, this.cellWidth*(this.n - 1));
-        this.add(beacon)
-        // get bounding box of beacon
-        let minBeacon = beacon.position.clone().sub(new Vector3(1,1,1));
-        let maxBeacon = beacon.position.clone().add(new Vector3(1,1,1));
-        this.beaconBB = new Box3(minBeacon, maxBeacon);
-
         // Let's put a floor ithis.n the middle of the maze
-        const material = new MeshPhongMaterial( {color: 0x1c1c1c } );
+        const textureLoader = new TextureLoader();
+        const floorMaterial = new MeshStandardMaterial( {
+                                                      map: textureLoader.load('src/components/textures/floor/soiltexture.jpg') } );
+
         let geometry = new BoxGeometry( this.cellWidth*(this.n + 2), this.cellWidth/8, this.cellWidth*(this.n + 2));
 
-        let floor = new Mesh(geometry, material)
+        let floor = new Mesh(geometry, floorMaterial)
         this.add(floor);
         floor.position.x = (this.cellWidth*this.n)/2;
         floor.position.z = (this.cellWidth*this.n)/2;
 
-        /*let ceiling = new Mesh(geometry, material)
-        this.add(ceiling);
-        ceiling.position.x = (this.cellWidth*this.n)/2;
-        ceiling.position.z = (this.cellWidth*this.n)/2;
-        ceiling.position.y = 4*this.cellWidth;*/
+        // Player spawn already set at (0, 3, 0) in app.js
+        // Set finish spot at opposite diagonal end of maze
+        let beaconGeometry = new CylinderGeometry(1, 1, 200, 32)
+        let beaconMaterial = new MeshBasicMaterial({wireframe: false, fog: false, toneMapped: false, color: 0xfceea7});
+
+        let beaconObj = new Mesh(beaconGeometry, beaconMaterial);
+        beaconObj.position.set(this.cellWidth*(this.n - 1), 6, this.cellWidth*(this.n - 1));
+        
+        this.add(beaconObj);
+
+        // get bounding box of beacon
+        let minBeacon = beaconObj.position.clone().sub(new Vector3(1,1,1));
+        let maxBeacon = beaconObj.position.clone().add(new Vector3(1,1,1));
+        this.beaconBB = new Box3(minBeacon, maxBeacon);
 
         // Setup for wall creation
-        const width = 17/16*this.cellWidth;
-        const height = 4*this.cellWidth;
+        const wallMaterials = [
+            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture_short.jpg')}),
+            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture_short.jpg')}),
+            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture_short.jpg')}),
+            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture_short.jpg')}),
+            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture.jpg')}),
+            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture.jpg')}),
+        ];
+
+        // Defines some wall size variables
+        this.height = 3/2*this.cellWidth;
         const depth = this.cellWidth/16;
-        geometry = new BoxGeometry(width, height, depth);
 
         // add perimiter walls
         this.walls = [];
@@ -100,24 +136,30 @@ class GameScene extends Scene {
         maze.runKruskals();
         let edges = maze.getEdges();
 
+        geometry = new BoxGeometry(this.cellWidth, this.height, depth);
+
         // Let's get the maze edges into the scene
         for (let i = 0; i < edges.length; i++) {
-            this.walls[i] = new Mesh( geometry, material );
-            this.walls[i].position.x = edges[i].x * this.cellWidth;
-            this.walls[i].position.z = edges[i].y * this.cellWidth;
-            this.walls[i].position.y = 2*this.cellWidth;
+            let rot;
+
             if (edges[i].x_orientation == true) {
-                this.walls[i].rotation.y = Math.PI/2
-                this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
+                rot = Math.PI/2; 
             }
             else {
-                this.walls[i].rotation.y = 0;
-                this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, false);
+                rot = 0;
             }
+
+            this.walls[i] = new Mesh( geometry, wallMaterials);
+            this.walls[i].position.x = edges[i].x * this.cellWidth;
+            this.walls[i].position.z = edges[i].y * this.cellWidth;
+            this.walls[i].position.y = this.height/2;
+            this.walls[i].rotation.y = rot;
+            this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, edges[i].x_orientation);
+            
             this.add(this.walls[i]);
         }
 
-        this.addPerimiter(geometry, material);
+        this.addPerimiter(geometry, wallMaterials);
 
         // TODO change walls and floor meshes and textures 
 
@@ -132,6 +174,58 @@ class GameScene extends Scene {
         }
     }
 
+    // borrowed from https://github.com/CoryG89/MoonDemo via https://github.com/gnuoyohes/blenderman
+    addSkyBackground() {
+        const path = 'src/components/textures/starfield/'; 
+        var envMap = new CubeTextureLoader().load( [
+              path + 'right.png', // right
+              path + 'left.png', // left
+              path + 'top.png', // top
+              path + 'bottom.png', // bottom
+              path + 'back.png', // back
+              path + 'front.png' // front
+          ] );
+      this.background = envMap;
+    }
+
+    runAudio(buffer) {
+        this.sound.setBuffer(buffer);
+        this.sound.play();
+
+    }
+
+    loadAudio(filename, callback) {
+        this.audioLdr.load( 'src/components/audio/' + filename, callback)
+    }
+
+    randomlyRunAudio() {
+        const sounds = [
+            'creepy_footstep',
+            'creepy_glass',
+            'creepy_laugh',
+            //'creepy_lullaby',
+            // 'night_ambient',
+            'player_heartbeat',
+        ]
+
+        const treshold = 0.1;
+        // Only play new sound if something isn't already playing (prevent overlap and hard cutoff)
+        if (!this.sound.isPlaying) {
+            // Generate odds increasing with player sanity
+            let randOdds = Math.random() * this.playerSanity;
+            if (randOdds <= treshold) {
+                // If won lottery, pick random noise to play
+                let randIdx = Math.round(Math.random() * (sounds.length - 1))
+                this.loadAudio(sounds[randIdx] + '.wav', this.boundRunAudio)
+            }
+        }
+    }
+
+    stopSound() {
+        this.sound.stop()
+        this.backgroundSound.stop();
+    }
+
     addPerimiter(geometry, material) {
         // Add perimeter walls around maze square
         // x: 0, z: 0.5 maze
@@ -142,7 +236,7 @@ class GameScene extends Scene {
             // Close side of the maze
             this.walls[i].position.x = -this.cellWidth/2; 
             this.walls[i].position.z = (i - len) * this.cellWidth;
-            this.walls[i].position.y = 2*this.cellWidth;
+            this.walls[i].position.y = this.height/2;
             this.walls[i].rotation.y = Math.PI/2
 
             this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
@@ -157,7 +251,7 @@ class GameScene extends Scene {
             // Far side of the maze
             this.walls[i].position.x = (this.n*this.cellWidth) - this.cellWidth/2; 
             this.walls[i].position.z = (i - len)*this.cellWidth;
-            this.walls[i].position.y = 2*this.cellWidth;
+            this.walls[i].position.y = this.height/2;
             this.walls[i].rotation.y = Math.PI/2
 
             this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, true);
@@ -172,7 +266,7 @@ class GameScene extends Scene {
             // Far side of the maze
             this.walls[i].position.x = (i - len) * this.cellWidth;
             this.walls[i].position.z = -this.cellWidth/2;
-            this.walls[i].position.y = 2*this.cellWidth;
+            this.walls[i].position.y = this.height/2;
             this.walls[i].rotation.y = 0;
 
             this.walls[i].bb = this.calculateBoundingBox(this.walls[i].position.x, this.walls[i].position.z, false);
@@ -187,7 +281,7 @@ class GameScene extends Scene {
             // Far side of the maze
             this.walls[i].position.x = (i - len)*this.cellWidth;
             this.walls[i].position.z = (this.n*this.cellWidth) - this.cellWidth/2;
-            this.walls[i].position.y = 2*this.cellWidth;
+            this.walls[i].position.y = this.height/2;
 
             this.walls[i].rotation.y = 0;
 
@@ -215,11 +309,15 @@ class GameScene extends Scene {
         // We readjust position to right in front of camera, this is our target
         lightPos.addScaledVector(dir, 3);
         this.flashlight.target.position.copy(lightPos);
-        //console.log(this.camera.position)
+
+        // We also update the light angle and intensity based on insanity level
+        this.flashlight.angle = this.baseLightAngle * this.playerSanity / 100;
+        this.flashlight.intensity = this.baseLightIntensity * this.playerSanity / 100;
     }
     update(timeStamp) {
         const { updateList } = this.state;
         this.updateFlashlight();
+        this.randomlyRunAudio();
         // Call update for each object in the updateList
         for (const obj of updateList) {
             obj.update(timeStamp);
@@ -253,6 +351,18 @@ class GameScene extends Scene {
             }
         }
         return undefined;
+    }
+
+    foundBeacon(camera) {
+        return this.beaconBB.containsPoint(camera.position);
+    }
+
+    decrementSanity() {
+        this.playerSanity--;
+    }
+
+    insane() {
+        return this.playerSanity == 0;
     }
 }
 

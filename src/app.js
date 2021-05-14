@@ -12,17 +12,18 @@ import { PlayerControls } from './PlayerControls.js'
 import { GameScene, BeginScene } from 'scenes';
 import { debug, SceneTypes } from './constants';
 import { log } from './helper'
+import EndScene from './components/scenes/EndScene.js';
 
 // Initialize core ThreeJS components
 const camera = new PerspectiveCamera();
-const controls = new PlayerControls(camera, document.body);
+let controls; 
 const renderer = new WebGLRenderer({ antialias: true });
 const clock = new Clock();
 
 
 // Set up camera
-camera.position.set(0, 3, 0);
-camera.lookAt(new Vector3(1, 3, 1));
+camera.position.set(0, 6, 0);
+camera.lookAt(new Vector3(1, 5, 1));
 
 // bounding box for camera
 //const playerBox = new Box3();
@@ -53,6 +54,8 @@ let currScene = SceneTypes.Begin;
 let beginScene;
 let gameScene;
 let endScene;
+let isGameWin = false;
+let secondsElapsed = 0;
 
 const startToGameHandler = () => {
     changeToGame(beginScene);
@@ -62,6 +65,7 @@ const startToGameHandler = () => {
 function changeToGame(initScene) {
     initScene.dispose();
     console.log("Game starting...")
+    controls = new PlayerControls(camera, document.body);
     gameScene = new GameScene(camera);
     controls.enable();
     currScene = SceneTypes.Game;
@@ -84,6 +88,23 @@ function renderScene(s, timeStamp) {
 const onAnimationFrameHandler = (timeStamp) => {
     if (currScene === SceneTypes.Game) {
         controls.update(gameScene, clock.getDelta());
+        if (gameScene.foundBeacon(camera)) {
+            gameScene.stopSound();
+            currScene = SceneTypes.End;
+            isGameWin = true;
+        }
+        let time = Math.floor(clock.getElapsedTime());
+        if (time > secondsElapsed) {
+            secondsElapsed += 1;
+            if (secondsElapsed % 3 == 0) {
+                gameScene.decrementSanity();
+            }
+        }
+        if (gameScene.insane()) {
+            gameScene.stopSound();
+            currScene = SceneTypes.End;
+            isGameWin = false;
+        }
         renderScene(gameScene, timeStamp);
     }
 
@@ -92,6 +113,8 @@ const onAnimationFrameHandler = (timeStamp) => {
     }
 
     if (currScene === SceneTypes.End) {
+        controls.unlock();
+        endScene = new EndScene(isGameWin, startToGameHandler);
         renderScene(endScene, timeStamp);
     }
     window.requestAnimationFrame(onAnimationFrameHandler);

@@ -15,7 +15,7 @@ class EndScene extends Scene {
 			this.menuElements.push(this.makeTextElement(endMenu.lose.name, endMenu.lose.offset));
 		}
         
-        this.menuElements.push(this.makeButton(endMenu.start.name, endMenu.start.offset, startGameCallback));
+        this.menuElements.push(this.makeButton(endMenu.replay.name, endMenu.replay.offset, startGameCallback));
 	}
 
 	makeButton(text, top, clickCallback) {
