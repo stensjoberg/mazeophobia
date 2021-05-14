@@ -85,7 +85,7 @@ class GameScene extends Scene {
         // =================================================================================
         // Defines size of maze
         this.cellWidth = 10;
-        this.n = 6;
+        this.n = 10;
 
         // Let's put a floor ithis.n the middle of the maze
         const textureLoader = new TextureLoader();
