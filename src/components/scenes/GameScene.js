@@ -5,6 +5,7 @@ import { Floor, Wall, } from 'objects';
 import Maze from './Maze';
 import { addText, getFont } from '../../helper';
 
+import creepy_footstep from '../audio/creepy_footstep.wav';
 import creepy_glass from '../audio/creepy_glass.wav';
 import heartbeat from '../audio/heartbeat.wav';
 import creepy_laugh from '../audio/creepy_laugh.wav';

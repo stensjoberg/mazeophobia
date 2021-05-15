@@ -2,6 +2,8 @@
 
 import { Audio, AudioListener, AudioLoader, Euler, Vector3 } from 'three';
 import { log } from './helper'
+
+import walk from './components/audio/player_walk.wav'
 class PlayerControls {
 	constructor(camera, domElement) {
 		this.camera = camera;
@@ -29,7 +31,7 @@ class PlayerControls {
 		this.camera.add(listener);
 		this.walkSound = new Audio(listener);
 		this.audioLoader = new AudioLoader();
-		this.audioLoader.load('src/components/audio/player_walk.wav', function( buffer ) {
+		this.audioLoader.load(walk, function( buffer ) {
 			this.walkSound.setBuffer( buffer );
 			this.walkSound.setLoop( true );
 			this.walkSound.setVolume( 0.4 );
