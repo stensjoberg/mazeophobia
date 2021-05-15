@@ -42,7 +42,7 @@ class GameScene extends Scene {
         this.add(this.camera);
 
         // Loading font for debug use later
-        const font = getFont();
+        // const font = getFont();
 
         // Set background to spooky color (doesn't matter if there is ceiling)
         this.addSkyBackground();
