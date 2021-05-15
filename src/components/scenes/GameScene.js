@@ -5,6 +5,25 @@ import { Floor, Wall, } from 'objects';
 import Maze from './Maze';
 import { addText, getFont } from '../../helper';
 
+import creepy_footstep from '../audio/creepy_footstep.wav';
+import creepy_glass from '../audio/creepy_glass.wav';
+import heartbeat from '../audio/heartbeat.wav';
+import creepy_laugh from '../audio/creepy_laugh.wav';
+import creepy_lullaby from '../audio/creepy_lullaby.wav';
+
+import night_ambient from '../audio/night_ambient.wav';
+
+import soiltexture from '../textures/floor/soiltexture.jpg';
+import walltex from '../textures/walls/bricktexture.jpg';
+import walltex_short from '../textures/walls/bricktexture_short.jpg';
+
+import star_back from '../textures/starfield/back.png';
+import star_bottom from '../textures/starfield/bottom.png';
+import star_front from '../textures/starfield/front.png';
+import star_left from '../textures/starfield/left.png';
+import star_right from '../textures/starfield/right.png';
+import star_top from '../textures/starfield/top.png';
+
 class GameScene extends Scene {
 
     
@@ -50,7 +69,7 @@ class GameScene extends Scene {
         this.boundRunAudio = this.runAudio.bind(this);
 
         this.backgroundSound = new Audio(listnr);
-        this.loadAudio('night_ambient.wav', function(buffer) {
+        this.loadAudio(night_ambient, function(buffer) {
             this.backgroundSound.setBuffer(buffer);
             this.backgroundSound.setLoop(true);
             this.backgroundSound.setVolume(0.3);
@@ -90,7 +109,7 @@ class GameScene extends Scene {
         // Let's put a floor ithis.n the middle of the maze
         const textureLoader = new TextureLoader();
         const floorMaterial = new MeshStandardMaterial( {
-                                                      map: textureLoader.load('src/components/textures/floor/soiltexture.jpg') } );
+                                                      map: textureLoader.load(soiltexture) } );
 
         let geometry = new BoxGeometry( this.cellWidth*(this.n + 2), this.cellWidth/8, this.cellWidth*(this.n + 2));
 
@@ -116,12 +135,12 @@ class GameScene extends Scene {
 
         // Setup for wall creation
         const wallMaterials = [
-            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture_short.jpg')}),
-            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture_short.jpg')}),
-            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture_short.jpg')}),
-            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture_short.jpg')}),
-            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture.jpg')}),
-            new MeshStandardMaterial({ map: textureLoader.load('src/components/textures/walls/bricktexture.jpg')}),
+            new MeshStandardMaterial({ map: textureLoader.load(walltex_short)}),
+            new MeshStandardMaterial({ map: textureLoader.load(walltex_short)}),
+            new MeshStandardMaterial({ map: textureLoader.load(walltex_short)}),
+            new MeshStandardMaterial({ map: textureLoader.load(walltex_short)}),
+            new MeshStandardMaterial({ map: textureLoader.load(walltex)}),
+            new MeshStandardMaterial({ map: textureLoader.load(walltex)}),
         ];
 
         // Defines some wall size variables
@@ -178,12 +197,12 @@ class GameScene extends Scene {
     addSkyBackground() {
         const path = 'src/components/textures/starfield/'; 
         var envMap = new CubeTextureLoader().load( [
-              path + 'right.png', // right
-              path + 'left.png', // left
-              path + 'top.png', // top
-              path + 'bottom.png', // bottom
-              path + 'back.png', // back
-              path + 'front.png' // front
+             star_right, // right
+              star_left, // left
+              star_top, // top
+              star_bottom, // bottom
+              star_back, // back
+              star_front // front
           ] );
       this.background = envMap;
     }
@@ -194,18 +213,16 @@ class GameScene extends Scene {
 
     }
 
-    loadAudio(filename, callback) {
-        this.audioLdr.load( 'src/components/audio/' + filename, callback)
+    loadAudio(file, callback) {
+        this.audioLdr.load(file, callback)
     }
 
     randomlyRunAudio() {
         const sounds = [
-            'creepy_footstep',
-            'creepy_glass',
-            'creepy_laugh',
-            //'creepy_lullaby',
-            // 'night_ambient',
-            'player_heartbeat',
+            creepy_footstep,
+            creepy_glass,
+            creepy_laugh,
+            heartbeat,
         ]
 
         const treshold = 0.1;
@@ -216,7 +233,7 @@ class GameScene extends Scene {
             if (randOdds <= treshold) {
                 // If won lottery, pick random noise to play
                 let randIdx = Math.round(Math.random() * (sounds.length - 1))
-                this.loadAudio(sounds[randIdx] + '.wav', this.boundRunAudio)
+                this.loadAudio(sounds[randIdx], this.boundRunAudio)
             }
         }
     }

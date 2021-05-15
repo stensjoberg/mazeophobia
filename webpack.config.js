@@ -13,7 +13,7 @@ module.exports = {
     target: 'web',
     devtool: 'source-map',
     stats: {
-        warnings: false
+        warnings: true
     },
     module: {
         rules: [
@@ -53,6 +53,8 @@ module.exports = {
             lights$: path.resolve(__dirname, 'src/components/lights'),
             objects$: path.resolve(__dirname, 'src/components/objects'),
             scenes$: path.resolve(__dirname, 'src/components/scenes'),
+            audio$: path.resolve(__dirname, 'src/components/audio'),
+            textures$: path.resolve(__dirname, 'src/components/textures'),
         },
     },
     plugins: [
